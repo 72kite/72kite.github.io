@@ -1,299 +1,627 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zion Jenkins — ePortfolio</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zion Jenkins — Computer Science ePortfolio</title>
+<meta name="description" content="CS 499 capstone ePortfolio: an Android inventory app enhanced across software design, algorithms, and database security.">
 
-    <!-- All styles in one place to keep the file simple -->
-    <style>
-        /* Base reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
 
-        /* Page defaults: dark ink on white, generous line height */
-        body {
-            font-family: Georgia, 'Times New Roman', serif;
-            color: #1a1a1a;
-            background: #fdfdfc;
-            line-height: 1.7;
-            max-width: 680px;      /* narrow column keeps it readable */
-            margin: 0 auto;
-            padding: 4rem 1.5rem;
-        }
+<style>
 
-        /* ---------- Animations ---------- */
+:root {
+  --paper:       #F4F5F2;
+  --raised:      #FFFFFF;
+  --ink:         #16181A;
+  --muted:       #6A6F72;
+  --rule:        #DDE0DB;
+  --accent:      #0E5B57;
+  --accent-soft: rgba(14, 91, 87, 0.09);
 
-        /* Fade up: elements rise into place on page load */
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(14px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+  --mono: 'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
+  --body: 'Source Serif 4', Georgia, 'Times New Roman', serif;
 
-        /* Each section fades in, one after another */
-        header, section, footer {
-            animation: fadeUp 0.6s ease both;
-        }
-        header  { animation-delay: 0.0s; }
-        section:nth-of-type(1) { animation-delay: 0.15s; }
-        section:nth-of-type(2) { animation-delay: 0.3s; }
-        section:nth-of-type(3) { animation-delay: 0.45s; }
-        section:nth-of-type(4) { animation-delay: 0.6s; }
-        footer  { animation-delay: 0.75s; }
+  --measure: 660px;
+}
 
-        /* Turn animations off for users who prefer reduced motion */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation: none !important;
-                transition: none !important;
-            }
-        }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* ---------- Layout ---------- */
+body {
+  font-family: var(--body);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
 
-        /* Small monospace labels used for section headings */
-        .label {
-            font-family: 'Courier New', monospace;
-            font-size: 0.75rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: #6b6b6b;
-            display: block;
-            margin-bottom: 0.75rem;
-        }
+.wrap {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
 
-        /* Name at the top */
-        h1 {
-            font-size: 2rem;
-            font-weight: normal;
-            margin-bottom: 0.25rem;
-        }
+a { color: var(--accent); }
 
-        /* One-line intro under the name */
-        .tagline {
-            color: #6b6b6b;
-            margin-bottom: 3rem;
-        }
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
 
-        /* Space between sections */
-        section {
-            margin-bottom: 3rem;
-        }
+/* ---------- Page-load sequence ---------- */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.seq { animation: rise 0.55s ease both; }
+.seq-1 { animation-delay: 0.00s; }
+.seq-2 { animation-delay: 0.12s; }
+.seq-3 { animation-delay: 0.24s; }
 
-        /* Project list: no bullets, ruled lines between items */
-        .projects {
-            list-style: none;
-        }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
 
-        .projects li {
-            padding: 1rem 0;
-            border-top: 1px solid #e4e4e0;
-            transition: padding-left 0.25s ease;   /* gentle slide on hover */
-        }
+/* ---------- Masthead ---------- */
+.masthead {
+  padding: 4.5rem 0 2.5rem;
+}
 
-        .projects li:hover {
-            padding-left: 0.5rem;
-        }
+.name {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.75rem, 6vw, 2.6rem);
+  letter-spacing: -0.045em;
+  line-height: 1.1;
+}
 
-        .projects li:last-child {
-            border-bottom: 1px solid #e4e4e0;
-        }
+.standfirst {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-top: 0.65rem;
+}
 
-        /* Project titles */
-        .projects a {
-            color: #1a1a1a;
-            text-decoration: none;
-            border-bottom: 1px solid #1a1a1a;
-            transition: color 0.2s ease, border-color 0.2s ease;
-        }
+/* ---------- Section scaffolding ---------- */
+.band {
+  border-top: 1px solid var(--rule);
+  padding: 2.75rem 0;
+}
 
-        .projects a:hover {
-            color: #2b5aa0;
-            border-color: #2b5aa0;
-        }
+.eyebrow {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1.1rem;
+}
 
-        /* Short description under each project title */
-        .projects p {
-            font-size: 0.95rem;
-            color: #555555;
-            margin-top: 0.25rem;
-        }
+.band p + p { margin-top: 0.9rem; }
 
-        /* ---------- Preview window ---------- */
+/* 
+   SIGNATURE: live Trie search
+ */
+.trie {
+  background: var(--raised);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 1.5rem;
+}
 
-        /* Small text button that toggles the preview */
-        .preview-toggle {
-            font-family: 'Courier New', monospace;
-            font-size: 0.75rem;
-            letter-spacing: 0.1em;
-            color: #6b6b6b;
-            background: none;
-            border: none;
-            cursor: pointer;
-            margin-top: 0.5rem;
-            padding: 0;
-        }
+.trie-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.6rem;
+}
 
-        .preview-toggle:hover {
-            color: #2b5aa0;
-        }
+.trie-input {
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--ink);
+  padding: 0.35rem 0;
+}
+.trie-input::placeholder { color: #B9BEC0; }
+.trie-input:focus { outline: none; border-bottom-color: var(--accent); }
 
-        /* The preview starts collapsed, then expands smoothly */
-        .preview {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease, opacity 0.4s ease;
-            opacity: 0;
-        }
+/* The walk: one node per character typed */
+.walk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 1.25rem;
+  min-height: 2.1rem;
+}
 
-        .preview.open {
-            max-height: 420px;   /* big enough for the window below */
-            opacity: 1;
-        }
+@keyframes pop {
+  from { opacity: 0; transform: scale(0.82); }
+  to   { opacity: 1; transform: scale(1); }
+}
 
-        /* Styled like a tiny browser window */
-        .window {
-            margin-top: 1rem;
-            border: 1px solid #d8d8d3;
-            border-radius: 8px;
-            overflow: hidden;
-            background: #ffffff;
-        }
+.node {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  font-weight: 500;
+  width: 1.9rem;
+  height: 1.9rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 2px;
+  animation: pop 0.18s ease both;
+}
+.node.dead {
+  border-color: #C24A3A;
+  color: #C24A3A;
+  background: rgba(194, 74, 58, 0.08);
+}
+.arrow { color: var(--muted); font-family: var(--mono); font-size: 0.7rem; }
 
-        /* Title bar with the three dots */
-        .window-bar {
-            background: #f1f1ee;
-            padding: 0.4rem 0.75rem;
-            display: flex;
-            gap: 6px;
-        }
+.walk-hint {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
 
-        .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #d8d8d3;
-        }
+/* The cost comparison — the actual argument the demo makes */
+.cost {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  margin-top: 1.25rem;
+}
+.cost div {
+  background: var(--raised);
+  padding: 0.75rem 0.9rem;
+}
+.cost dt {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.cost dd {
+  font-family: var(--mono);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  margin-top: 0.2rem;
+}
+.cost .win dd { color: var(--accent); }
 
-        /* The content area of the window.
-           Swap the placeholder for a real screenshot:
-           <img src="screenshot.png" alt="Project screenshot" style="width:100%; display:block;"> */
-        .window-body {
-            padding: 0;
-        }
+.hits {
+  list-style: none;
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--rule);
+}
+.hits li {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.hits li b { color: var(--accent); font-weight: 600; }
+.hits li.empty { color: var(--muted); border-bottom: none; }
 
-        .placeholder {
-            height: 220px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Courier New', monospace;
-            font-size: 0.8rem;
-            color: #9a9a9a;
-            background:
-                linear-gradient(#fdfdfc, #fdfdfc) padding-box,
-                repeating-linear-gradient(45deg, #f4f4f1 0, #f4f4f1 12px, #fdfdfc 12px, #fdfdfc 24px);
-        }
+.caption {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-top: 1rem;
+}
 
-        /* Contact links */
-        .contact a {
-            color: #1a1a1a;
-        }
+/* ---------- Enhancement entries ---------- */
+.entry {
+  padding: 1.6rem 0;
+  border-top: 1px solid var(--rule);
+}
+.entry:first-of-type { border-top: none; padding-top: 0; }
 
-        footer {
-            margin-top: 4rem;
-            font-size: 0.85rem;
-            color: #9a9a9a;
-        }
-    </style>
+.entry-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.entry-title {
+  font-family: var(--mono);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Status is honest reporting, so it gets its own vocabulary */
+.status {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.status.done { color: var(--accent); border-color: var(--accent); }
+
+.entry p { margin-top: 0.7rem; font-size: 1rem; }
+
+.stack {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-top: 0.8rem;
+}
+
+.entry-links {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  margin-top: 0.8rem;
+}
+.entry-links a { text-decoration: none; border-bottom: 1px solid var(--accent); }
+.entry-links a:hover { background: var(--accent-soft); }
+
+/* Encrypted-bytes proof inside the database entry */
+.bytes {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  line-height: 1.9;
+  background: var(--raised);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 0.9rem;
+  margin-top: 1rem;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.bytes span { color: var(--muted); }
+.bytes .plain { color: #C24A3A; }
+.bytes .cipher { color: var(--accent); }
+
+/* ---------- Media slots ---------- */
+.slot {
+  aspect-ratio: 16 / 9;
+  display: grid;
+  place-items: center;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+  background: var(--raised);
+  border: 1px dashed var(--rule);
+  border-radius: 3px;
+  margin-top: 1rem;
+}
+
+/* ---------- Skills ---------- */
+.skills {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+
+/* ---------- Contact / footer ---------- */
+.contact-links {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+}
+.contact-links a { text-decoration: none; border-bottom: 1px solid var(--accent); }
+
+.colophon {
+  border-top: 1px solid var(--rule);
+  padding: 2rem 0 4rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+@media (max-width: 520px) {
+  .cost { grid-template-columns: 1fr; }
+  .trie { padding: 1.1rem; }
+}
+</style>
 </head>
 <body>
 
-    <!-- Header: name and short tagline -->
-    <header>
-        <h1>Zion Jenkins</h1>
-        <p class="tagline">Computer Science student · Southern New Hampshire University</p>
-    </header>
+<div class="wrap">
 
-    <!-- About section -->
-    <section>
-        <span class="label">About</span>
-        <p>
-            I build software across the stack — from mobile apps to machine
-            learning agents. Below is a selection of my coursework and
-            personal projects.
-        </p>
-    </section>
+  <!-- ============ MASTHEAD ============ -->
+  <header class="masthead seq seq-1">
+    <h1 class="name">Zion Jenkins</h1>
+    <p class="standfirst">COMPUTER SCIENCE · SOUTHERN NEW HAMPSHIRE UNIVERSITY</p>
+  </header>
 
-    <!-- Projects section: add a new <li> block for each project -->
-    <section>
-        <span class="label">Projects</span>
-        <ul class="projects">
-            <li>
-                <a href="https://github.com/72kite/CS-360-16504-M01-Mobile-Architect-Programming">Mobile Architecture Project</a>
-                <p>Android application built with a focus on UI design, data persistence, and mobile architecture patterns.</p>
+  <!-- ============ SIGNATURE: TRIE DEMO ============ -->
+  <section class="band seq seq-2" style="border-top:none; padding-top:0;">
+    <span class="eyebrow">Search, the way my app does it</span>
 
-                <!-- Button that opens/closes the preview below -->
-                <button class="preview-toggle" onclick="togglePreview(this)">[ preview ]</button>
+    <div class="trie">
+      <label class="trie-label" for="q">Inventory search — 30 items</label>
+      <input class="trie-input" id="q" type="text" placeholder="type a prefix…"
+             autocomplete="off" spellcheck="false" value="wr">
 
-                <!-- Preview window: replace the placeholder div with an
-                     <img> of your project screenshot when you have one -->
-                <div class="preview">
-                    <div class="window">
-                        <div class="window-bar">
-                            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                        </div>
-                        <div class="window-body">
-                            <div class="placeholder">screenshot coming soon</div>
-                        </div>
-                    </div>
-                </div>
-            </li>
+      <!-- The tree walk, drawn as you type -->
+      <div class="walk" id="walk" aria-hidden="true"></div>
 
-            <!-- Copy the whole <li> block above to add more projects -->
-        </ul>
-    </section>
+      <!-- The comparison this whole demo exists to make -->
+      <dl class="cost">
+        <div class="win">
+          <dt>Trie — node hops</dt>
+          <dd id="trieCost">2</dd>
+        </div>
+        <div>
+          <dt>Linear scan — comparisons</dt>
+          <dd id="scanCost">30</dd>
+        </div>
+      </dl>
 
-    <!-- Skills section -->
-    <section>
-        <span class="label">Skills</span>
-        <p>Java · Python · JavaScript · SQL · Android · TensorFlow · Git</p>
-    </section>
+      <ul class="hits" id="hits" aria-live="polite"></ul>
+    </div>
 
-    <!-- Contact section -->
-    <section class="contact">
-        <span class="label">Contact</span>
-        <p>
-            <a href="https://github.com/72kite">GitHub</a> ·
-            <a href="mailto:zionk.dev@proton.me">Email</a>
-        </p>
-    </section>
+    <p class="caption">
+      A prefix tree walks one node per character you type. A linear scan
+      checks every item, every keystroke. Grow the inventory to 10,000 items
+      and the right-hand number becomes 10,000 — the left-hand number stays
+      exactly where it is. That property is the reason I replaced the search
+      in my capstone project.
+    </p>
+  </section>
 
-    <!-- Footer -->
-    <footer>
-        © 2026 Zion Jenkins
-    </footer>
+  <!-- ============ SELF-ASSESSMENT ============ -->
+  <section class="band seq seq-3">
+    <span class="eyebrow">Professional self-assessment</span>
+    <p>
+      I build software across the stack, and the work I care most about is the
+      part users never see: the decision underneath the screen. My capstone took
+      an Android inventory app I wrote earlier in the program and rebuilt it
+      three times over — once for structure, once for speed, once for safety.
+    </p>
+    <p>
+      What that process taught me is that the three are the same skill. A
+      Repository sitting between the ViewModel and the data layer is what made
+      swapping raw SQLite for an encrypted Room database a contained change
+      rather than a rewrite. Good structure is what buys you the freedom to fix
+      things later.
+    </p>
+    <p>
+      I am looking for software engineering work where security is treated as a
+      design constraint from the first commit rather than a task filed for after
+      launch.
+    </p>
+  </section>
 
-    <!-- Tiny script: opens and closes a project's preview window -->
-    <script>
-        function togglePreview(button) {
-            // The preview div sits right after the button
-            const preview = button.nextElementSibling;
-            const isOpen = preview.classList.toggle('open');
+  <!-- ============ ENHANCEMENTS ============
+       Three parallel categories, not a sequence — so no 01/02/03.
+       Each entry: what it was, what I did, what it cost, where the code is.
+  -->
+  <section class="band">
+    <span class="eyebrow">Capstone enhancements · CS 499</span>
 
-            // Update the button text to match the state
-            button.textContent = isOpen ? '[ close ]' : '[ preview ]';
-        }
-    </script>
+    <article class="entry">
+      <div class="entry-head">
+        <h2 class="entry-title">Software design &amp; engineering</h2>
+        <span class="status">In progress</span>
+      </div>
+      <p>
+        The original app put database calls directly in its Activities. I
+        refactored it to MVVM with a Repository layer, so the UI asks for
+        inventory without knowing where inventory lives. The ViewModel design is
+        complete; View binding is the remaining work.
+      </p>
+      <p class="stack">Java · Android · MVVM · Repository pattern · LiveData</p>
+      <div class="entry-links">
+        <a href="https://github.com/72kite/CS-360-16504-M01-Mobile-Architect-Programming">Source</a>
+      </div>
+      <!-- Replace with a real screenshot:
+           <img src="img/mvvm.png" alt="Architecture diagram" style="width:100%;border-radius:3px;"> -->
+      <div class="slot">architecture diagram — coming soon</div>
+    </article>
+
+    <article class="entry">
+      <div class="entry-head">
+        <h2 class="entry-title">Algorithms &amp; data structures</h2>
+        <span class="status">Integration pending</span>
+      </div>
+      <p>
+        Search was a full-table scan on every keystroke. I designed a Trie index
+        that resolves a prefix in steps proportional to the length of the query
+        instead of the size of the inventory, plus a MergeSort pass for stable
+        ordering of results. The demo at the top of this page runs the same
+        structure in the browser. Integration into the Repository is the next
+        step.
+      </p>
+      <p class="stack">Java · Trie / prefix tree · MergeSort · JUnit</p>
+      <div class="entry-links">
+        <a href="https://github.com/72kite/CS-360-16504-M01-Mobile-Architect-Programming">Source</a>
+      </div>
+    </article>
+
+    <article class="entry">
+      <div class="entry-head">
+        <h2 class="entry-title">Databases</h2>
+        <span class="status done">Complete</span>
+      </div>
+      <p>
+        The app stored inventory in an unencrypted SQLite file — readable by
+        anyone who pulled it off the device. I migrated it to Room backed by
+        SQLCipher with 256-bit AES, and moved the passphrase out of the source
+        and into runtime. The proof is in the first sixteen bytes of the database
+        file:
+      </p>
+      <div class="bytes">
+<span>before</span>  <span class="plain">53 51 4C 69 74 65 20 66 6F 72 6D 61 74 20 33 00</span>  <span>→ "SQLite format 3"</span><br>
+<span>after </span>  <span class="cipher">A7 3C 1E 90 44 D2 0B 5F E1 88 7A 33 C6 09 2D B4</span>  <span>→ ciphertext</span>
+      </div>
+      <p class="stack">Room · SQLCipher · SQLite · AES-256</p>
+      <div class="entry-links">
+        <a href="https://github.com/72kite/CS-360-16504-M01-Mobile-Architect-Programming">Source</a>
+      </div>
+    </article>
+  </section>
+
+  <!-- ============ CODE REVIEW ============ -->
+  <section class="band">
+    <span class="eyebrow">Code review</span>
+    <p>
+      A walkthrough of the original codebase, the weaknesses I found in it, and
+      the plan for each enhancement above.
+    </p>
+    <!-- Replace with the YouTube embed:
+         <iframe class="slot" style="border:none;" src="https://www.youtube.com/embed/VIDEO_ID"
+                 title="Code review" allowfullscreen></iframe> -->
+    <div class="slot">code review video — coming soon</div>
+  </section>
+
+  <!-- ============ SKILLS ============ -->
+  <section class="band">
+    <span class="eyebrow">Skills</span>
+    <p class="skills">
+      Java · Python · JavaScript · SQL · Android · Room · SQLCipher ·
+      TensorFlow · Git
+    </p>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section class="band">
+    <span class="eyebrow">Contact</span>
+    <p class="contact-links">
+      <a href="https://github.com/72kite">GitHub</a> ·
+      <a href="mailto:zionk.dev@proton.me">Email</a>
+    </p>
+  </section>
+
+  <footer class="colophon">© 2026 ZION JENKINS</footer>
+
+</div>
+
+<script>
+
+
+const INVENTORY = [
+  "Bearing", "Battery Pack", "Bolt", "Bracket",
+  "Caliper", "Clamp", "Coupling", "Cable Tie",
+  "Dowel", "Drill Bit",
+  "Gasket", "Grommet",
+  "Hex Key", "Hinge", "Hose Clamp",
+  "O-Ring",
+  "Pipe Fitting", "Pulley",
+  "Rivet", "Router Bit",
+  "Sandpaper", "Sealant", "Socket Set", "Spring",
+  "Terminal Block", "Thread Lock",
+  "Valve",
+  "Washer", "Widget", "Wrench Set"
+];
+
+// --- Node: one character, its children, and the items ending here ---
+function TrieNode() {
+  this.children = Object.create(null);
+  this.items = [];
+}
+
+// --- Build: insert every item under every character of its name ---
+const root = new TrieNode();
+for (const item of INVENTORY) {
+  let node = root;
+  for (const ch of item.toLowerCase()) {
+    if (!node.children[ch]) node.children[ch] = new TrieNode();
+    node = node.children[ch];
+    node.items.push(item);          // every node knows its own subtree
+  }
+}
+
+// --- Walk: follow the prefix, reporting where (if) it breaks ---
+function walk(prefix) {
+  let node = root;
+  const path = [];
+  for (const ch of prefix.toLowerCase()) {
+    const next = node.children[ch];
+    if (!next) {
+      path.push({ ch: ch, alive: false });
+      return { path: path, items: [] };
+    }
+    path.push({ ch: ch, alive: true });
+    node = next;
+  }
+  return { path: path, items: node.items };
+}
+
+// --- Render ---
+const input    = document.getElementById('q');
+const walkEl   = document.getElementById('walk');
+const hitsEl   = document.getElementById('hits');
+const trieCost = document.getElementById('trieCost');
+const scanCost = document.getElementById('scanCost');
+
+function render() {
+  const prefix = input.value.trim();
+
+  if (!prefix) {
+    walkEl.innerHTML = '<span class="walk-hint">start typing to walk the tree</span>';
+    hitsEl.innerHTML = '<li class="empty">' + INVENTORY.length + ' items indexed</li>';
+    trieCost.textContent = '0';
+    scanCost.textContent = '0';
+    return;
+  }
+
+  const result = walk(prefix);
+
+  // The path: one node per character, red where the tree runs out
+  walkEl.innerHTML = result.path.map(function (step, i) {
+    const arrow = i ? '<span class="arrow">→</span>' : '';
+    const cls   = step.alive ? 'node' : 'node dead';
+    return arrow + '<span class="' + cls + '">' + step.ch + '</span>';
+  }).join('');
+
+  // Cost: hops equal the characters walked; a scan touches everything
+  trieCost.textContent = result.path.length;
+  scanCost.textContent = INVENTORY.length;
+
+  // Matches, with the matched prefix marked
+  if (result.items.length) {
+    hitsEl.innerHTML = result.items.slice(0, 6).map(function (item) {
+      return '<li><b>' + item.slice(0, prefix.length) + '</b>' +
+             item.slice(prefix.length) + '</li>';
+    }).join('') + (result.items.length > 6
+      ? '<li class="empty">+ ' + (result.items.length - 6) + ' more</li>' : '');
+  } else {
+    hitsEl.innerHTML = '<li class="empty">no items start with "' + prefix + '"</li>';
+  }
+}
+
+input.addEventListener('input', render);
+render();
+</script>
 
 </body>
 </html>

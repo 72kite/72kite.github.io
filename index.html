@@ -108,7 +108,7 @@ a { color: var(--accent); }
 
 .band p + p { margin-top: 0.9rem; }
 
-/* 
+/*
    SIGNATURE: live Trie search
  */
 .trie {
@@ -431,15 +431,20 @@ a { color: var(--accent); }
     <article class="entry">
       <div class="entry-head">
         <h2 class="entry-title">Software design &amp; engineering</h2>
-        <span class="status">In progress</span>
+        <span class="status done">Complete</span>
       </div>
       <p>
-        The original app put database calls directly in its Activities. I
-        refactored it to MVVM with a Repository layer, so the UI asks for
-        inventory without knowing where inventory lives. The ViewModel design is
-        complete; View binding is the remaining work.
+        The original app put database calls directly in its Activities, using a
+        hand-written <code>SQLiteOpenHelper</code> and synchronous calls on
+        whatever thread invoked them. I rebuilt it as a Kotlin MVVM
+        architecture — Activity → ViewModel → Repository → DAO — over
+        coroutines and Flow, so the UI asks for inventory without knowing
+        where it lives or how it's fetched. The legacy Java Activities and the
+        two parallel, unsynchronized data layers left behind from an earlier
+        incomplete migration are gone; a restored instrumented test suite
+        covers the real Room database that replaced them.
       </p>
-      <p class="stack">Java · Android · MVVM · Repository pattern · LiveData</p>
+      <p class="stack">Kotlin · Android · MVVM · Repository pattern · Coroutines · Flow · LiveData</p>
       <div class="entry-links">
         <a href="https://github.com/72kite/inventory-management-android">Source</a>
       </div>
@@ -451,15 +456,17 @@ a { color: var(--accent); }
     <article class="entry">
       <div class="entry-head">
         <h2 class="entry-title">Algorithms &amp; data structures</h2>
-        <span class="status">Integration pending</span>
+        <span class="status done">Complete</span>
       </div>
       <p>
-        Search was a full-table scan on every keystroke. I designed a Trie index
-        that resolves a prefix in steps proportional to the length of the query
-        instead of the size of the inventory, plus a MergeSort pass for stable
-        ordering of results. The demo at the top of this page runs the same
-        structure in the browser. Integration into the Repository is the next
-        step.
+        Search was a full-table scan on every keystroke. I designed a Trie
+        index that resolves a prefix in steps proportional to the length of
+        the query instead of the size of the inventory, plus a stable
+        MergeSort pass for predictable ordering. The demo at the top of this
+        page runs the same structure in the browser. In the app, the
+        Repository rebuilds the index from Room's reactive query stream and
+        keeps it scoped to whichever user is signed in, with a JUnit suite
+        covering both structures independent of Android.
       </p>
       <p class="stack">Java · Trie / prefix tree · MergeSort · JUnit</p>
       <div class="entry-links">
@@ -474,16 +481,24 @@ a { color: var(--accent); }
       </div>
       <p>
         The app stored inventory in an unencrypted SQLite file — readable by
-        anyone who pulled it off the device. I migrated it to Room backed by
-        SQLCipher with 256-bit AES, and moved the passphrase out of the source
-        and into runtime. The proof is in the first sixteen bytes of the database
-        file:
+        anyone who pulled it off the device — and hashed nothing. I migrated
+        it to Room backed by SQLCipher with 256-bit AES, moved the passphrase
+        out of the source and into Keystore-backed runtime storage, and
+        replaced plaintext password comparison with PBKDF2 and a per-user
+        salt. The proof is in the first sixteen bytes of the database file:
       </p>
       <div class="bytes">
 <span>before</span>  <span class="plain">53 51 4C 69 74 65 20 66 6F 72 6D 61 74 20 33 00</span>  <span>→ "SQLite format 3"</span><br>
 <span>after </span>  <span class="cipher">A7 3C 1E 90 44 D2 0B 5F E1 88 7A 33 C6 09 2D B4</span>  <span>→ ciphertext</span>
       </div>
-      <p class="stack">Room · SQLCipher · SQLite · AES-256</p>
+      <p>
+        The schema change under that encryption — adding a foreign key that
+        scopes every item to its owner — runs through a real
+        <code>Migration</code>, not a destructive fallback. It's now verified
+        by replaying it against an actual pre-migration database file on a
+        physical device, not just a diff against the target schema.
+      </p>
+      <p class="stack">Kotlin · Room · SQLCipher · SQLite · AES-256 · PBKDF2</p>
       <div class="entry-links">
         <a href="https://github.com/72kite/inventory-management-android">Source</a>
       </div>
@@ -507,7 +522,7 @@ a { color: var(--accent); }
   <section class="band">
     <span class="eyebrow">Skills</span>
     <p class="skills">
-      Java · Python · JavaScript · SQL · Android · Room · SQLCipher ·
+      Kotlin · Java · Python · JavaScript · SQL · Android · Room · SQLCipher ·
       TensorFlow · Git
     </p>
   </section>

@@ -89,6 +89,16 @@ a { color: var(--accent); }
   margin-top: 0.65rem;
 }
 
+.jumprow {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  color: var(--rule);
+  margin-top: 1.1rem;
+}
+.jumprow a { color: var(--muted); text-decoration: none; }
+.jumprow a:hover { color: var(--accent); }
+
 /* ---------- Section scaffolding ---------- */
 .band {
   border-top: 1px solid var(--rule);
@@ -307,6 +317,16 @@ a { color: var(--accent); }
 .bytes .plain { color: #C24A3A; }
 .bytes .cipher { color: var(--accent); }
 
+/* ---------- Architecture diagram ---------- */
+.diagram {
+  background: var(--raised);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+.diagram svg { display: block; width: 100%; height: auto; }
+
 /* ---------- Media slots ---------- */
 .slot {
   aspect-ratio: 16 / 9;
@@ -360,10 +380,17 @@ a { color: var(--accent); }
   <header class="masthead seq seq-1">
     <h1 class="name">Zion Jenkins</h1>
     <p class="standfirst">COMPUTER SCIENCE · SOUTHERN NEW HAMPSHIRE UNIVERSITY</p>
+    <nav class="jumprow" aria-label="Section navigation">
+      <a href="#search-demo">Search demo</a> ·
+      <a href="#self-assessment">Self-assessment</a> ·
+      <a href="#enhancements">Enhancements</a> ·
+      <a href="#code-review">Code review</a> ·
+      <a href="#contact">Contact</a>
+    </nav>
   </header>
 
   <!-- ============ SIGNATURE: TRIE DEMO ============ -->
-  <section class="band seq seq-2" style="border-top:none; padding-top:0;">
+  <section id="search-demo" class="band seq seq-2" style="border-top:none; padding-top:0;">
     <span class="eyebrow">Search, the way my app does it</span>
 
     <div class="trie">
@@ -399,25 +426,54 @@ a { color: var(--accent); }
   </section>
 
   <!-- ============ SELF-ASSESSMENT ============ -->
-  <section class="band seq seq-3">
+  <section id="self-assessment" class="band seq seq-3">
     <span class="eyebrow">Professional self-assessment</span>
     <p>
       I build software across the stack, and the work I care most about is the
       part users never see: the decision underneath the screen. My capstone took
       an Android inventory app I wrote earlier in the program and rebuilt it
       three times over — once for structure, once for speed, once for safety.
+      Before any of that, I already understood the problem it solves: I
+      coordinate a team and a stock count every shift as a retail Team Lead, and
+      this app is a rebuild of a process I already run by hand.
     </p>
     <p>
-      What that process taught me is that the three are the same skill. A
-      Repository sitting between the ViewModel and the data layer is what made
-      swapping raw SQLite for an encrypted Room database a contained change
-      rather than a rewrite. Good structure is what buys you the freedom to fix
-      things later.
+      Most of my coursework was completed independently, so I treated
+      documentation and architecture as a stand-in for a teammate who wasn't in
+      the room — a Repository layer that lets someone swap the data source
+      without touching the UI is the same instinct that keeps a team aligned
+      when the person coordinating it changes shift to shift. Translating
+      technical work for people outside engineering is a skill I built the same
+      way, training volunteers on AV systems and, in coursework like CS 255's
+      client-interview case study, extracting real requirements from how a
+      stakeholder actually talks about their problem rather than from a
+      specification document. This portfolio applies the same instinct: one
+      codebase, presented three different ways for three different readers.
     </p>
     <p>
-      I am looking for software engineering work where security is treated as a
-      design constraint from the first commit rather than a task filed for after
-      launch.
+      Algorithmically, the enhancement I'm proudest of replaced a full linear
+      scan with the hand-built prefix tree above — O(k) instead of O(n),
+      independent of inventory size — paired with a stable custom MergeSort, and
+      proven with unit tests rather than just asserted in a comment.
+    </p>
+    <p>
+      What the rest of the process taught me is that structure, speed, and
+      safety are the same skill. A Repository sitting between the ViewModel and
+      the data layer is what made swapping raw SQLite for an encrypted Room
+      database a contained change rather than a rewrite — the same seam let me
+      add a foreign-key-scoped schema migration, verified against a real
+      pre-migration database file, without the UI layer needing to change at
+      all.
+    </p>
+    <p>
+      Security, to me, is a design constraint, not a task filed for after
+      launch: passwords are hashed with PBKDF2 and a per-user salt, the database
+      is encrypted at rest behind a passphrase that's never a literal value in
+      source, and where I couldn't fully close a gap — this app's Google
+      sign-in has no backend to verify tokens against — I documented that trust
+      boundary honestly instead of implying a guarantee the architecture doesn't
+      actually provide. That's the kind of software engineering work I'm looking
+      for next.
     </p>
   </section>
 
@@ -425,7 +481,7 @@ a { color: var(--accent); }
        Three parallel categories, not a sequence — so no 01/02/03.
        Each entry: what it was, what I did, what it cost, where the code is.
   -->
-  <section class="band">
+  <section id="enhancements" class="band">
     <span class="eyebrow">Capstone enhancements · CS 499</span>
 
     <article class="entry">
@@ -446,11 +502,46 @@ a { color: var(--accent); }
       </p>
       <p class="stack">Kotlin · Android · MVVM · Repository pattern · Coroutines · Flow · LiveData</p>
       <div class="entry-links">
-        <a href="https://github.com/72kite/inventory-management-android">Source</a>
+        <a href="https://github.com/72kite/inventory-management-android">Source</a> ·
+        <a href="https://github.com/72kite/inventory-management-android/tree/ce25ac8">Before</a>
       </div>
-      <!-- Replace with a real screenshot:
-           <img src="img/mvvm.png" alt="Architecture diagram" style="width:100%;border-radius:3px;"> -->
-      <div class="slot">architecture diagram — coming soon</div>
+      <div class="diagram" role="img" aria-label="Architecture diagram: Activity calls ViewModel, ViewModel calls Repository, Repository fans out to Room database with SQLCipher and to the PrefixTrie search index">
+        <svg viewBox="0 0 640 210" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"></path>
+            </marker>
+          </defs>
+
+          <!-- flow: Activity -> ViewModel -> Repository -> { Room+SQLCipher, PrefixTrie } -->
+          <line x1="112" y1="40" x2="152" y2="40" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arrow)"></line>
+          <line x1="272" y1="40" x2="312" y2="40" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arrow)"></line>
+          <line x1="432" y1="34" x2="466" y2="34" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arrow)"></line>
+          <line x1="410" y1="52" x2="466" y2="150" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arrow)"></line>
+
+          <g font-family="var(--mono)" font-size="12" font-weight="600">
+            <rect x="8" y="18" width="104" height="44" rx="3" fill="var(--raised)" stroke="var(--rule)"></rect>
+            <text x="60" y="36" text-anchor="middle" fill="var(--ink)">Activity</text>
+            <text x="60" y="52" text-anchor="middle" fill="var(--muted)" font-size="9" font-weight="500">renders state</text>
+
+            <rect x="152" y="18" width="120" height="44" rx="3" fill="var(--raised)" stroke="var(--rule)"></rect>
+            <text x="212" y="36" text-anchor="middle" fill="var(--ink)">ViewModel</text>
+            <text x="212" y="52" text-anchor="middle" fill="var(--muted)" font-size="9" font-weight="500">holds UI state</text>
+
+            <rect x="312" y="18" width="120" height="44" rx="3" fill="var(--raised)" stroke="var(--rule)"></rect>
+            <text x="372" y="36" text-anchor="middle" fill="var(--ink)">Repository</text>
+            <text x="372" y="52" text-anchor="middle" fill="var(--muted)" font-size="9" font-weight="500">mediates access</text>
+
+            <rect x="466" y="12" width="160" height="44" rx="3" fill="var(--accent-soft)" stroke="var(--accent)"></rect>
+            <text x="546" y="30" text-anchor="middle" fill="var(--accent)">Room · SQLCipher</text>
+            <text x="546" y="46" text-anchor="middle" fill="var(--accent)" font-size="9" font-weight="500">encrypted at rest</text>
+
+            <rect x="466" y="128" width="160" height="44" rx="3" fill="var(--accent-soft)" stroke="var(--accent)"></rect>
+            <text x="546" y="146" text-anchor="middle" fill="var(--accent)">PrefixTrie</text>
+            <text x="546" y="162" text-anchor="middle" fill="var(--accent)" font-size="9" font-weight="500">O(k) search index</text>
+          </g>
+        </svg>
+      </div>
     </article>
 
     <article class="entry">
@@ -470,7 +561,8 @@ a { color: var(--accent); }
       </p>
       <p class="stack">Java · Trie / prefix tree · MergeSort · JUnit</p>
       <div class="entry-links">
-        <a href="https://github.com/72kite/inventory-management-android">Source</a>
+        <a href="https://github.com/72kite/inventory-management-android">Source</a> ·
+        <a href="https://github.com/72kite/inventory-management-android/tree/ce25ac8">Before</a>
       </div>
     </article>
 
@@ -506,7 +598,7 @@ a { color: var(--accent); }
   </section>
 
   <!-- ============ CODE REVIEW ============ -->
-  <section class="band">
+  <section id="code-review" class="band">
     <span class="eyebrow">Code review</span>
     <p>
       A walkthrough of the original codebase, the weaknesses I found in it, and
@@ -528,7 +620,7 @@ a { color: var(--accent); }
   </section>
 
   <!-- ============ CONTACT ============ -->
-  <section class="band">
+  <section id="contact" class="band">
     <span class="eyebrow">Contact</span>
     <p class="contact-links">
       <a href="https://github.com/72kite">GitHub</a> ·

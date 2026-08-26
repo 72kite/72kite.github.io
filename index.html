@@ -9,725 +9,315 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
-
-<style>
-
-:root {
-  --paper:       #F4F5F2;
-  --raised:      #FFFFFF;
-  --ink:         #16181A;
-  --muted:       #6A6F72;
-  --rule:        #DDE0DB;
-  --accent:      #0E5B57;
-  --accent-soft: rgba(14, 91, 87, 0.09);
-
-  --mono: 'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
-  --body: 'Source Serif 4', Georgia, 'Times New Roman', serif;
-
-  --measure: 660px;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  font-family: var(--body);
-  font-size: 1.0625rem;
-  line-height: 1.65;
-  color: var(--ink);
-  background: var(--paper);
-  -webkit-font-smoothing: antialiased;
-}
-
-.wrap {
-  max-width: var(--measure);
-  margin: 0 auto;
-  padding: 0 1.5rem;
-}
-
-a { color: var(--accent); }
-
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
-
-/* ---------- Page-load sequence ---------- */
-@keyframes rise {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.seq { animation: rise 0.55s ease both; }
-.seq-1 { animation-delay: 0.00s; }
-.seq-2 { animation-delay: 0.12s; }
-.seq-3 { animation-delay: 0.24s; }
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation: none !important;
-    transition: none !important;
-  }
-}
-
-/* ---------- Masthead ---------- */
-.masthead {
-  padding: 4.5rem 0 2.5rem;
-}
-
-.name {
-  font-family: var(--mono);
-  font-weight: 600;
-  font-size: clamp(1.75rem, 6vw, 2.6rem);
-  letter-spacing: -0.045em;
-  line-height: 1.1;
-}
-
-.standfirst {
-  font-family: var(--mono);
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-  margin-top: 0.65rem;
-}
-
-.jumprow {
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.05em;
-  color: var(--rule);
-  margin-top: 1.1rem;
-}
-.jumprow a { color: var(--muted); text-decoration: none; }
-.jumprow a:hover { color: var(--accent); }
-
-/* ---------- Section scaffolding ---------- */
-.band {
-  border-top: 1px solid var(--rule);
-  padding: 2.75rem 0;
-}
-
-.eyebrow {
-  display: block;
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 1.1rem;
-}
-
-.band p + p { margin-top: 0.9rem; }
-
-/*
-   SIGNATURE: live Trie search
- */
-.trie {
-  background: var(--raised);
-  border: 1px solid var(--rule);
-  border-radius: 3px;
-  padding: 1.5rem;
-}
-
-.trie-label {
-  display: block;
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 0.6rem;
-}
-
-.trie-input {
-  width: 100%;
-  font-family: var(--mono);
-  font-size: 1.25rem;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  color: var(--ink);
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid var(--ink);
-  padding: 0.35rem 0;
-}
-.trie-input::placeholder { color: #B9BEC0; }
-.trie-input:focus { outline: none; border-bottom-color: var(--accent); }
-
-/* The walk: one node per character typed */
-.walk {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.3rem;
-  margin-top: 1.25rem;
-  min-height: 2.1rem;
-}
-
-@keyframes pop {
-  from { opacity: 0; transform: scale(0.82); }
-  to   { opacity: 1; transform: scale(1); }
-}
-
-.node {
-  font-family: var(--mono);
-  font-size: 0.85rem;
-  font-weight: 500;
-  width: 1.9rem;
-  height: 1.9rem;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--accent);
-  color: var(--accent);
-  background: var(--accent-soft);
-  border-radius: 2px;
-  animation: pop 0.18s ease both;
-}
-.node.dead {
-  border-color: #C24A3A;
-  color: #C24A3A;
-  background: rgba(194, 74, 58, 0.08);
-}
-.arrow { color: var(--muted); font-family: var(--mono); font-size: 0.7rem; }
-
-.walk-hint {
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  color: var(--muted);
-}
-
-/* The cost comparison — the actual argument the demo makes */
-.cost {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  background: var(--rule);
-  border: 1px solid var(--rule);
-  border-radius: 2px;
-  margin-top: 1.25rem;
-}
-.cost div {
-  background: var(--raised);
-  padding: 0.75rem 0.9rem;
-}
-.cost dt {
-  font-family: var(--mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.cost dd {
-  font-family: var(--mono);
-  font-size: 1.35rem;
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  margin-top: 0.2rem;
-}
-.cost .win dd { color: var(--accent); }
-
-.hits {
-  list-style: none;
-  margin-top: 1.25rem;
-  border-top: 1px solid var(--rule);
-}
-.hits li {
-  font-family: var(--mono);
-  font-size: 0.82rem;
-  padding: 0.4rem 0;
-  border-bottom: 1px solid var(--rule);
-}
-.hits li b { color: var(--accent); font-weight: 600; }
-.hits li.empty { color: var(--muted); border-bottom: none; }
-
-.caption {
-  font-size: 0.9rem;
-  color: var(--muted);
-  margin-top: 1rem;
-}
-
-/* ---------- Enhancement entries ---------- */
-.entry {
-  padding: 1.6rem 0;
-  border-top: 1px solid var(--rule);
-}
-.entry:first-of-type { border-top: none; padding-top: 0; }
-
-.entry-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-
-.entry-title {
-  font-family: var(--mono);
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-
-/* Status is honest reporting, so it gets its own vocabulary */
-.status {
-  font-family: var(--mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 0.15rem 0.5rem;
-  border: 1px solid var(--rule);
-  border-radius: 2px;
-  color: var(--muted);
-  white-space: nowrap;
-}
-.status.done { color: var(--accent); border-color: var(--accent); }
-
-.entry p { margin-top: 0.7rem; font-size: 1rem; }
-
-.stack {
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.06em;
-  color: var(--muted);
-  margin-top: 0.8rem;
-}
-
-.entry-links {
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  margin-top: 0.8rem;
-}
-.entry-links a { text-decoration: none; border-bottom: 1px solid var(--accent); }
-.entry-links a:hover { background: var(--accent-soft); }
-
-/* Encrypted-bytes proof inside the database entry */
-.bytes {
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  line-height: 1.9;
-  background: var(--raised);
-  border: 1px solid var(--rule);
-  border-radius: 2px;
-  padding: 0.9rem;
-  margin-top: 1rem;
-  overflow-x: auto;
-  white-space: nowrap;
-}
-.bytes span { color: var(--muted); }
-.bytes .plain { color: #C24A3A; }
-.bytes .cipher { color: var(--accent); }
-
-/* ---------- Architecture diagram ---------- */
-.diagram {
-  background: var(--raised);
-  border: 1px solid var(--rule);
-  border-radius: 3px;
-  padding: 1rem;
-  margin-top: 1rem;
-}
-.diagram svg { display: block; width: 100%; height: auto; }
-
-/* ---------- Media slots ---------- */
-.slot {
-  aspect-ratio: 16 / 9;
-  display: grid;
-  place-items: center;
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  color: var(--muted);
-  background: var(--raised);
-  border: 1px dashed var(--rule);
-  border-radius: 3px;
-  margin-top: 1rem;
-}
-
-.video {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border: 1px solid var(--rule);
-  border-radius: 3px;
-  margin-top: 1rem;
-}
-
-/* ---------- Projects (resume-style, compact) ---------- */
-.projects-list { margin-top: 1.5rem; }
-
-.project-row {
-  padding: 1.1rem 0;
-  border-top: 1px solid var(--rule);
-}
-.project-row:first-of-type { border-top: none; padding-top: 0; }
-
-.project-row-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-
-.project-row-title {
-  font-family: var(--mono);
-  font-size: 0.92rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.project-row-desc {
-  margin-top: 0.55rem;
-  font-size: 0.92rem;
-}
-
-/* ---------- Skills ---------- */
-.skills {
-  font-family: var(--mono);
-  font-size: 0.82rem;
-  letter-spacing: 0.04em;
-  color: var(--ink);
-}
-
-/* ---------- Contact / footer ---------- */
-.contact-links {
-  font-family: var(--mono);
-  font-size: 0.85rem;
-  letter-spacing: 0.04em;
-}
-.contact-links a { text-decoration: none; border-bottom: 1px solid var(--accent); }
-
-.colophon {
-  border-top: 1px solid var(--rule);
-  padding: 2rem 0 4rem;
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-}
-
-@media (max-width: 520px) {
-  .cost { grid-template-columns: 1fr; }
-  .trie { padding: 1.1rem; }
-}
-</style>
+<link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 
-<div class="wrap">
+<!-- ============ NAV (liquid glass) ============ -->
+<nav class="glass-nav" aria-label="Section navigation">
+  <a class="brand" href="index.html">ZK</a>
+  <a href="#search-demo">Search demo</a>
+  <a href="#enhancements">Enhancements</a>
+  <a href="#code-review">Code review</a>
+  <a href="#projects">Projects</a>
+  <a href="self-assessment.html">Self-assessment</a>
+</nav>
 
-  <!-- ============ MASTHEAD ============ -->
-  <header class="masthead seq seq-1">
-    <h1 class="name">Zion Jenkins</h1>
-    <p class="standfirst">COMPUTER SCIENCE · SOUTHERN NEW HAMPSHIRE UNIVERSITY</p>
-    <nav class="jumprow" aria-label="Section navigation">
-      <a href="#search-demo">Search demo</a> ·
-      <a href="#self-assessment">Self-assessment</a> ·
-      <a href="#enhancements">Enhancements</a> ·
-      <a href="#code-review">Code review</a> ·
-      <a href="#projects">Projects</a> ·
-      <a href="#contact">Contact</a>
-    </nav>
-  </header>
+<div class="layout">
 
-  <!-- ============ SIGNATURE: TRIE DEMO ============ -->
-  <section id="search-demo" class="band seq seq-2" style="border-top:none; padding-top:0;">
-    <span class="eyebrow">Search, the way my app does it</span>
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar seq seq-1">
+    <div class="avatar">
+      <img src="assets/profile-placeholder.png" alt="Placeholder headshot — a real photo is coming soon">
+    </div>
+    <p class="avatar-note">Placeholder — real headshot coming soon</p>
 
-    <div class="trie">
-      <label class="trie-label" for="q">Inventory search — 30 items</label>
-      <input class="trie-input" id="q" type="text" placeholder="type a prefix…"
-             autocomplete="off" spellcheck="false" value="wr">
-
-      <!-- The tree walk, drawn as you type -->
-      <div class="walk" id="walk" aria-hidden="true"></div>
-
-      <!-- The comparison this whole demo exists to make -->
-      <dl class="cost">
-        <div class="win">
-          <dt>Trie — node hops</dt>
-          <dd id="trieCost">2</dd>
-        </div>
-        <div>
-          <dt>Linear scan — comparisons</dt>
-          <dd id="scanCost">30</dd>
-        </div>
-      </dl>
-
-      <ul class="hits" id="hits" aria-live="polite"></ul>
+    <div>
+      <h1 class="side-name">Zion Jenkins</h1>
+      <p class="side-standfirst">COMPUTER SCIENCE · SNHU</p>
     </div>
 
-    <p class="caption">
-      A prefix tree walks one node per character you type. A linear scan
-      checks every item, every keystroke. Grow the inventory to 10,000 items
-      and the right-hand number becomes 10,000 — the left-hand number stays
-      exactly where it is. That property is the reason I replaced the search
-      in my capstone project.
-    </p>
-  </section>
-
-  <!-- ============ SELF-ASSESSMENT ============ -->
-  <section id="self-assessment" class="band seq seq-3">
-    <span class="eyebrow">Professional self-assessment</span>
-    <p>
-      I build software across the stack, and the work I care most about is the
-      part users never see: the decision underneath the screen. My capstone took
-      an Android inventory app I wrote earlier in the program and rebuilt it
-      three times over — once for structure, once for speed, once for safety.
-      Before any of that, I already understood the problem it solves: I
-      coordinate a team and a stock count every shift as a retail Team Lead, and
-      this app is a rebuild of a process I already run by hand.
-    </p>
-    <p>
-      Most of my coursework was completed independently, so I treated
-      documentation and architecture as a stand-in for a teammate who wasn't in
-      the room — a Repository layer that lets someone swap the data source
-      without touching the UI is the same instinct that keeps a team aligned
-      when the person coordinating it changes shift to shift. Translating
-      technical work for people outside engineering is a skill I built the same
-      way, training volunteers on AV systems and, in coursework like CS 255's
-      client-interview case study, extracting real requirements from how a
-      stakeholder actually talks about their problem rather than from a
-      specification document. This portfolio applies the same instinct: one
-      codebase, presented three different ways for three different readers.
-    </p>
-    <p>
-      Algorithmically, the enhancement I'm proudest of replaced a full linear
-      scan with the hand-built prefix tree above — O(k) instead of O(n),
-      independent of inventory size — paired with a stable custom MergeSort, and
-      proven with unit tests rather than just asserted in a comment.
-    </p>
-    <p>
-      What the rest of the process taught me is that structure, speed, and
-      safety are the same skill. A Repository sitting between the ViewModel and
-      the data layer is what made swapping raw SQLite for an encrypted Room
-      database a contained change rather than a rewrite — the same seam let me
-      add a foreign-key-scoped schema migration, verified against a real
-      pre-migration database file, without the UI layer needing to change at
-      all.
-    </p>
-    <p>
-      Security, to me, is a design constraint, not a task filed for after
-      launch: passwords are hashed with PBKDF2 and a per-user salt, the database
-      is encrypted at rest behind a passphrase that's never a literal value in
-      source, and where I couldn't fully close a gap — this app's Google
-      sign-in has no backend to verify tokens against — I documented that trust
-      boundary honestly instead of implying a guarantee the architecture doesn't
-      actually provide. That's the kind of software engineering work I'm looking
-      for next.
-    </p>
-  </section>
-
-  <!-- ============ ENHANCEMENTS ============
-       Three parallel categories, not a sequence — so no 01/02/03.
-       Each entry: what it was, what I did, what it cost, where the code is.
-  -->
-  <section id="enhancements" class="band">
-    <span class="eyebrow">Capstone enhancements · CS 499</span>
-
-    <article class="entry">
-      <div class="entry-head">
-        <h2 class="entry-title">Software design &amp; engineering</h2>
-        <span class="status done">Complete</span>
+    <div class="side-block">
+      <span class="side-label">Contact</span>
+      <div class="side-contact">
+        <a href="https://github.com/72kite">GitHub</a>
+        <a href="mailto:zionk.dev@proton.me">Email</a>
       </div>
-      <p>
-        The original app put database calls directly in its Activities, using a
-        hand-written <code>SQLiteOpenHelper</code> and synchronous calls on
-        whatever thread invoked them. I rebuilt it as a Kotlin MVVM
-        architecture — Activity → ViewModel → Repository → DAO — over
-        coroutines and Flow, so the UI asks for inventory without knowing
-        where it lives or how it's fetched. The legacy Java Activities and the
-        two parallel, unsynchronized data layers left behind from an earlier
-        incomplete migration are gone; a restored instrumented test suite
-        covers the real Room database that replaced them.
+    </div>
+
+    <div class="side-block">
+      <span class="side-label">Skills</span>
+      <p class="side-skills">
+        Kotlin · Java · Python · JavaScript · SQL · Android · Room ·
+        SQLCipher · TensorFlow · Git
       </p>
-      <p class="stack">Kotlin · Android · MVVM · Repository pattern · Coroutines · Flow · LiveData</p>
-      <div class="entry-links">
-        <a href="https://github.com/72kite/inventory-management-android">Source</a> ·
-        <a href="https://github.com/72kite/inventory-management-android/tree/ce25ac8">Before</a> ·
-        <a href="narratives/Milestone_Two_Narrative_Software_Design_and_Engineering.docx">Full narrative (.docx)</a>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN CONTENT ============ -->
+  <main class="content">
+
+    <!-- ============ SIGNATURE: TRIE DEMO ============ -->
+    <section id="search-demo" class="band seq seq-2" style="border-top:none; padding-top:0;">
+      <span class="eyebrow">Search, the way my app does it</span>
+
+      <div class="trie">
+        <label class="trie-label" for="q">Inventory search — 30 items</label>
+        <input class="trie-input" id="q" type="text" placeholder="type a prefix…"
+               autocomplete="off" spellcheck="false" value="wr">
+
+        <!-- The tree walk, drawn as you type -->
+        <div class="walk" id="walk" aria-hidden="true"></div>
+
+        <!-- The comparison this whole demo exists to make -->
+        <dl class="cost">
+          <div class="win">
+            <dt>Trie — node hops</dt>
+            <dd id="trieCost">2</dd>
+          </div>
+          <div>
+            <dt>Linear scan — comparisons</dt>
+            <dd id="scanCost">30</dd>
+          </div>
+        </dl>
+
+        <ul class="hits" id="hits" aria-live="polite"></ul>
       </div>
-      <div class="diagram" role="img" aria-label="Architecture diagram: Activity calls ViewModel, ViewModel calls Repository, Repository fans out to Room database with SQLCipher and to the PrefixTrie search index">
-        <svg viewBox="0 0 640 210" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
-          <defs>
-            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-              <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"></path>
-            </marker>
-          </defs>
 
-          <!-- flow: Activity -> ViewModel -> Repository -> { Room+SQLCipher, PrefixTrie } -->
-          <line x1="112" y1="40" x2="152" y2="40" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arrow)"></line>
-          <line x1="272" y1="40" x2="312" y2="40" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arrow)"></line>
-          <line x1="432" y1="34" x2="466" y2="34" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arrow)"></line>
-          <line x1="410" y1="52" x2="466" y2="150" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arrow)"></line>
-
-          <g font-family="var(--mono)" font-size="12" font-weight="600">
-            <rect x="8" y="18" width="104" height="44" rx="3" fill="var(--raised)" stroke="var(--rule)"></rect>
-            <text x="60" y="36" text-anchor="middle" fill="var(--ink)">Activity</text>
-            <text x="60" y="52" text-anchor="middle" fill="var(--muted)" font-size="9" font-weight="500">renders state</text>
-
-            <rect x="152" y="18" width="120" height="44" rx="3" fill="var(--raised)" stroke="var(--rule)"></rect>
-            <text x="212" y="36" text-anchor="middle" fill="var(--ink)">ViewModel</text>
-            <text x="212" y="52" text-anchor="middle" fill="var(--muted)" font-size="9" font-weight="500">holds UI state</text>
-
-            <rect x="312" y="18" width="120" height="44" rx="3" fill="var(--raised)" stroke="var(--rule)"></rect>
-            <text x="372" y="36" text-anchor="middle" fill="var(--ink)">Repository</text>
-            <text x="372" y="52" text-anchor="middle" fill="var(--muted)" font-size="9" font-weight="500">mediates access</text>
-
-            <rect x="466" y="12" width="160" height="44" rx="3" fill="var(--accent-soft)" stroke="var(--accent)"></rect>
-            <text x="546" y="30" text-anchor="middle" fill="var(--accent)">Room · SQLCipher</text>
-            <text x="546" y="46" text-anchor="middle" fill="var(--accent)" font-size="9" font-weight="500">encrypted at rest</text>
-
-            <rect x="466" y="128" width="160" height="44" rx="3" fill="var(--accent-soft)" stroke="var(--accent)"></rect>
-            <text x="546" y="146" text-anchor="middle" fill="var(--accent)">PrefixTrie</text>
-            <text x="546" y="162" text-anchor="middle" fill="var(--accent)" font-size="9" font-weight="500">O(k) search index</text>
-          </g>
-        </svg>
-      </div>
-    </article>
-
-    <article class="entry">
-      <div class="entry-head">
-        <h2 class="entry-title">Algorithms &amp; data structures</h2>
-        <span class="status done">Complete</span>
-      </div>
-      <p>
-        Search was a full-table scan on every keystroke. I designed a Trie
-        index that resolves a prefix in steps proportional to the length of
-        the query instead of the size of the inventory, plus a stable
-        MergeSort pass for predictable ordering. The demo at the top of this
-        page runs the same structure in the browser. In the app, the
-        Repository rebuilds the index from Room's reactive query stream and
-        keeps it scoped to whichever user is signed in, with a JUnit suite
-        covering both structures independent of Android.
+      <p class="caption">
+        A prefix tree walks one node per character you type. A linear scan
+        checks every item, every keystroke. Grow the inventory to 10,000 items
+        and the right-hand number becomes 10,000 — the left-hand number stays
+        exactly where it is. That property is the reason I replaced the search
+        in my capstone project.
       </p>
-      <p class="stack">Java · Trie / prefix tree · MergeSort · JUnit</p>
-      <div class="entry-links">
-        <a href="https://github.com/72kite/inventory-management-android">Source</a> ·
-        <a href="https://github.com/72kite/inventory-management-android/tree/ce25ac8">Before</a> ·
-        <a href="narratives/Milestone_Three_Narrative_Algorithms_and_Data_Structures.docx">Full narrative (.docx)</a>
-      </div>
-    </article>
+    </section>
 
-    <article class="entry">
-      <div class="entry-head">
-        <h2 class="entry-title">Databases</h2>
-        <span class="status done">Complete</span>
-      </div>
+    <!-- ============ SELF-ASSESSMENT TEASER ============ -->
+    <section class="band">
+      <span class="eyebrow">Professional self-assessment</span>
       <p>
-        The app stored inventory in an unencrypted SQLite file — readable by
-        anyone who pulled it off the device — and hashed nothing. I migrated
-        it to Room backed by SQLCipher with 256-bit AES, moved the passphrase
-        out of the source and into Keystore-backed runtime storage, and
-        replaced plaintext password comparison with PBKDF2 and a per-user
-        salt. The proof is in the first sixteen bytes of the database file:
+        Why I build the way I build: coordinating a shift-work retail team
+        taught me the same instincts a Repository layer is built on, and
+        four years of mostly independent coursework turned documentation
+        and architecture into a stand-in for a teammate who wasn't in the
+        room.
       </p>
-      <div class="bytes">
+      <p class="entry-links" style="margin-top: 1rem;">
+        <a href="self-assessment.html">Read the full self-assessment →</a>
+      </p>
+    </section>
+
+    <!-- ============ ENHANCEMENTS ============
+         Three parallel categories, not a sequence — so no 01/02/03.
+         Each entry: what it was, what I did, what it cost, where the code is.
+    -->
+    <section id="enhancements" class="band">
+      <span class="eyebrow">Capstone enhancements · CS 499</span>
+
+      <article class="entry">
+        <div class="entry-head">
+          <h2 class="entry-title">Software design &amp; engineering</h2>
+          <span class="status done">Complete</span>
+        </div>
+        <p>
+          The original app put database calls directly in its Activities, using a
+          hand-written <code>SQLiteOpenHelper</code> and synchronous calls on
+          whatever thread invoked them. I rebuilt it as a Kotlin MVVM
+          architecture — Activity → ViewModel → Repository → DAO — over
+          coroutines and Flow, so the UI asks for inventory without knowing
+          where it lives or how it's fetched. The legacy Java Activities and the
+          two parallel, unsynchronized data layers left behind from an earlier
+          incomplete migration are gone; a restored instrumented test suite
+          covers the real Room database that replaced them.
+        </p>
+        <p class="stack">Kotlin · Android · MVVM · Repository pattern · Coroutines · Flow · LiveData</p>
+        <div class="entry-links">
+          <a href="https://github.com/72kite/inventory-management-android">Source</a> ·
+          <a href="https://github.com/72kite/inventory-management-android/tree/ce25ac8">Before</a> ·
+          <a href="narratives/Milestone_Two_Narrative_Software_Design_and_Engineering.docx">Full narrative (.docx)</a>
+        </div>
+        <div class="diagram" role="img" aria-label="Architecture diagram: Activity calls ViewModel, ViewModel calls Repository, Repository fans out to Room database with SQLCipher and to the PrefixTrie search index">
+          <svg viewBox="0 0 640 210" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"></path>
+              </marker>
+            </defs>
+
+            <!-- flow: Activity -> ViewModel -> Repository -> { Room+SQLCipher, PrefixTrie } -->
+            <line x1="112" y1="40" x2="152" y2="40" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arrow)"></line>
+            <line x1="272" y1="40" x2="312" y2="40" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arrow)"></line>
+            <line x1="432" y1="34" x2="466" y2="34" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arrow)"></line>
+            <line x1="410" y1="52" x2="466" y2="150" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arrow)"></line>
+
+            <g font-family="var(--mono)" font-size="12" font-weight="600">
+              <rect x="8" y="18" width="104" height="44" rx="3" fill="var(--raised)" stroke="var(--rule)"></rect>
+              <text x="60" y="36" text-anchor="middle" fill="var(--ink)">Activity</text>
+              <text x="60" y="52" text-anchor="middle" fill="var(--muted)" font-size="9" font-weight="500">renders state</text>
+
+              <rect x="152" y="18" width="120" height="44" rx="3" fill="var(--raised)" stroke="var(--rule)"></rect>
+              <text x="212" y="36" text-anchor="middle" fill="var(--ink)">ViewModel</text>
+              <text x="212" y="52" text-anchor="middle" fill="var(--muted)" font-size="9" font-weight="500">holds UI state</text>
+
+              <rect x="312" y="18" width="120" height="44" rx="3" fill="var(--raised)" stroke="var(--rule)"></rect>
+              <text x="372" y="36" text-anchor="middle" fill="var(--ink)">Repository</text>
+              <text x="372" y="52" text-anchor="middle" fill="var(--muted)" font-size="9" font-weight="500">mediates access</text>
+
+              <rect x="466" y="12" width="160" height="44" rx="3" fill="var(--accent-soft)" stroke="var(--accent)"></rect>
+              <text x="546" y="30" text-anchor="middle" fill="var(--accent)">Room · SQLCipher</text>
+              <text x="546" y="46" text-anchor="middle" fill="var(--accent)" font-size="9" font-weight="500">encrypted at rest</text>
+
+              <rect x="466" y="128" width="160" height="44" rx="3" fill="var(--accent-soft)" stroke="var(--accent)"></rect>
+              <text x="546" y="146" text-anchor="middle" fill="var(--accent)">PrefixTrie</text>
+              <text x="546" y="162" text-anchor="middle" fill="var(--accent)" font-size="9" font-weight="500">O(k) search index</text>
+            </g>
+          </svg>
+        </div>
+      </article>
+
+      <article class="entry">
+        <div class="entry-head">
+          <h2 class="entry-title">Algorithms &amp; data structures</h2>
+          <span class="status done">Complete</span>
+        </div>
+        <p>
+          Search was a full-table scan on every keystroke. I designed a Trie
+          index that resolves a prefix in steps proportional to the length of
+          the query instead of the size of the inventory, plus a stable
+          MergeSort pass for predictable ordering. The demo at the top of this
+          page runs the same structure in the browser. In the app, the
+          Repository rebuilds the index from Room's reactive query stream and
+          keeps it scoped to whichever user is signed in, with a JUnit suite
+          covering both structures independent of Android.
+        </p>
+        <p class="stack">Java · Trie / prefix tree · MergeSort · JUnit</p>
+        <div class="entry-links">
+          <a href="https://github.com/72kite/inventory-management-android">Source</a> ·
+          <a href="https://github.com/72kite/inventory-management-android/tree/ce25ac8">Before</a> ·
+          <a href="narratives/Milestone_Three_Narrative_Algorithms_and_Data_Structures.docx">Full narrative (.docx)</a>
+        </div>
+      </article>
+
+      <article class="entry">
+        <div class="entry-head">
+          <h2 class="entry-title">Databases</h2>
+          <span class="status done">Complete</span>
+        </div>
+        <p>
+          The app stored inventory in an unencrypted SQLite file — readable by
+          anyone who pulled it off the device — and hashed nothing. I migrated
+          it to Room backed by SQLCipher with 256-bit AES, moved the passphrase
+          out of the source and into Keystore-backed runtime storage, and
+          replaced plaintext password comparison with PBKDF2 and a per-user
+          salt. The proof is in the first sixteen bytes of the database file:
+        </p>
+        <div class="bytes">
 <span>before</span>  <span class="plain">53 51 4C 69 74 65 20 66 6F 72 6D 61 74 20 33 00</span>  <span>→ "SQLite format 3"</span><br>
 <span>after </span>  <span class="cipher">A7 3C 1E 90 44 D2 0B 5F E1 88 7A 33 C6 09 2D B4</span>  <span>→ ciphertext</span>
-      </div>
+        </div>
+        <p>
+          The schema change under that encryption — adding a foreign key that
+          scopes every item to its owner — runs through a real
+          <code>Migration</code>, not a destructive fallback. It's now verified
+          by replaying it against an actual pre-migration database file on a
+          physical device, not just a diff against the target schema.
+        </p>
+        <p class="stack">Kotlin · Room · SQLCipher · SQLite · AES-256 · PBKDF2</p>
+        <div class="entry-links">
+          <a href="https://github.com/72kite/inventory-management-android">Source</a> ·
+          <a href="https://github.com/72kite/inventory-management-android/tree/ce25ac8">Before</a> ·
+          <a href="narratives/Milestone_Four_Narrative_Databases.docx">Full narrative (.docx)</a>
+        </div>
+      </article>
+    </section>
+
+    <!-- ============ CODE REVIEW ============ -->
+    <section id="code-review" class="band">
+      <span class="eyebrow">Code review</span>
       <p>
-        The schema change under that encryption — adding a foreign key that
-        scopes every item to its owner — runs through a real
-        <code>Migration</code>, not a destructive fallback. It's now verified
-        by replaying it against an actual pre-migration database file on a
-        physical device, not just a diff against the target schema.
+        A walkthrough of the original codebase, the weaknesses I found in it, and
+        the plan for each enhancement above.
       </p>
-      <p class="stack">Kotlin · Room · SQLCipher · SQLite · AES-256 · PBKDF2</p>
-      <div class="entry-links">
-        <a href="https://github.com/72kite/inventory-management-android">Source</a> ·
-        <a href="https://github.com/72kite/inventory-management-android/tree/ce25ac8">Before</a> ·
-        <a href="narratives/Milestone_Four_Narrative_Databases.docx">Full narrative (.docx)</a>
+      <iframe class="video" src="https://www.youtube.com/embed/g9_eI3Yfrw0"
+              title="Code review" allowfullscreen loading="lazy"></iframe>
+    </section>
+
+    <!-- ============ PROJECTS ============
+         Resume-style: one compact row per project, not a full narrative.
+         Copy a .project-row article to add the next one — the list stays
+         scannable no matter how many entries it grows to.
+    -->
+    <section id="projects" class="band">
+      <span class="eyebrow">Other projects</span>
+      <p>
+        The capstone above is the deep dive. These are quicker looks at other
+        things I've built — a running list, not a portfolio-per-project.
+      </p>
+
+      <div class="projects-list">
+        <article class="project-row">
+          <div class="project-row-head">
+            <h3 class="project-row-title">tau — local voice assistant</h3>
+            <span class="status">Private build</span>
+          </div>
+          <p class="project-row-desc">
+            A wake-word ("hey tau") assistant that runs entirely on hardware I
+            own — local LLM, encrypted memory, home-device control. The live
+            system needs a GPU and a house full of devices to mean anything, so
+            I built a static, scripted walkthrough of the real UI instead of
+            pretending a hosted demo would show the same thing.
+          </p>
+          <p class="stack">TypeScript · React · local LLM · wake-word detection · encrypted storage</p>
+          <div class="entry-links">
+            <a href="demo/tau/index.html">Walkthrough</a> ·
+            <a href="mailto:zionk.dev@proton.me?subject=tau%20-%20stripped-down%20build">Request a runnable build</a>
+          </div>
+        </article>
+
+        <article class="project-row">
+          <div class="project-row-head">
+            <h3 class="project-row-title">Leo — typing trainer, race mode &amp; MIDI piano studio</h3>
+            <span class="status">Private build</span>
+          </div>
+          <p class="project-row-desc">
+            One account across three real-time products: a typing trainer, a Socket.io-relayed
+            multiplayer race, and a MIDI piano studio with falling-note notation and a chord
+            selector — all backed by an Express server with JWT auth and a swappable JSON/Postgres
+            persistence layer. The live app needs a running backend, so this is a static, scripted
+            walkthrough of the actual UI instead.
+          </p>
+          <p class="stack">React · Zustand · Express · Socket.io · JWT · Web Audio/MIDI · PostgreSQL (opt-in)</p>
+          <div class="entry-links">
+            <a href="demo/leo/index.html">Walkthrough</a> ·
+            <a href="mailto:zionk.dev@proton.me?subject=Leo%20-%20walkthrough%20follow-up">Request a runnable build</a>
+          </div>
+        </article>
       </div>
-    </article>
-  </section>
+    </section>
 
-  <!-- ============ CODE REVIEW ============ -->
-  <section id="code-review" class="band">
-    <span class="eyebrow">Code review</span>
-    <p>
-      A walkthrough of the original codebase, the weaknesses I found in it, and
-      the plan for each enhancement above.
-    </p>
-    <iframe class="video" src="https://www.youtube.com/embed/g9_eI3Yfrw0"
-            title="Code review" allowfullscreen loading="lazy"></iframe>
-  </section>
+    <footer class="colophon">© 2026 ZION JENKINS</footer>
 
-  <!-- ============ PROJECTS ============
-       Resume-style: one compact row per project, not a full narrative.
-       Copy a .project-row article to add the next one — the list stays
-       scannable no matter how many entries it grows to.
-  -->
-  <section id="projects" class="band">
-    <span class="eyebrow">Other projects</span>
-    <p>
-      The capstone above is the deep dive. These are quicker looks at other
-      things I've built — a running list, not a portfolio-per-project.
-    </p>
+  </main>
+</div>
 
-    <div class="projects-list">
-      <article class="project-row">
-        <div class="project-row-head">
-          <h3 class="project-row-title">tau — local voice assistant</h3>
-          <span class="status">Private build</span>
-        </div>
-        <p class="project-row-desc">
-          A wake-word ("hey tau") assistant that runs entirely on hardware I
-          own — local LLM, encrypted memory, home-device control. The live
-          system needs a GPU and a house full of devices to mean anything, so
-          I built a static, scripted walkthrough of the real UI instead of
-          pretending a hosted demo would show the same thing.
-        </p>
-        <p class="stack">TypeScript · React · local LLM · wake-word detection · encrypted storage</p>
-        <div class="entry-links">
-          <a href="demo/tau/index.html">Walkthrough</a> ·
-          <a href="mailto:zionk.dev@proton.me?subject=tau%20-%20stripped-down%20build">Request a runnable build</a>
-        </div>
-      </article>
-
-      <article class="project-row">
-        <div class="project-row-head">
-          <h3 class="project-row-title">Leo — typing trainer, race mode &amp; MIDI piano studio</h3>
-          <span class="status">Private build</span>
-        </div>
-        <p class="project-row-desc">
-          One account across three real-time products: a typing trainer, a Socket.io-relayed
-          multiplayer race, and a MIDI piano studio with falling-note notation and a chord
-          selector — all backed by an Express server with JWT auth and a swappable JSON/Postgres
-          persistence layer. The live app needs a running backend, so this is a static, scripted
-          walkthrough of the actual UI instead.
-        </p>
-        <p class="stack">React · Zustand · Express · Socket.io · JWT · Web Audio/MIDI · PostgreSQL (opt-in)</p>
-        <div class="entry-links">
-          <a href="demo/leo/index.html">Walkthrough</a> ·
-          <a href="mailto:zionk.dev@proton.me?subject=Leo%20-%20walkthrough%20follow-up">Request a runnable build</a>
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <!-- ============ SKILLS ============ -->
-  <section class="band">
-    <span class="eyebrow">Skills</span>
-    <p class="skills">
-      Kotlin · Java · Python · JavaScript · SQL · Android · Room · SQLCipher ·
-      TensorFlow · Git
-    </p>
-  </section>
-
-  <!-- ============ CONTACT ============ -->
-  <section id="contact" class="band">
-    <span class="eyebrow">Contact</span>
-    <p class="contact-links">
-      <a href="https://github.com/72kite">GitHub</a> ·
-      <a href="mailto:zionk.dev@proton.me">Email</a>
-    </p>
-  </section>
-
-  <footer class="colophon">© 2026 ZION JENKINS</footer>
-
+<!-- ============ JEFF, THE LANDSHARK ============ -->
+<div class="jeff-track" aria-hidden="true">
+  <svg class="jeff" viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
+    <g class="jeff-bob">
+      <path class="jeff-leg jeff-leg-a" d="M40,56 L36,68" stroke="#1E6FA6" stroke-width="6" stroke-linecap="round" fill="none"></path>
+      <path class="jeff-leg jeff-leg-b" d="M64,56 L68,68" stroke="#1E6FA6" stroke-width="6" stroke-linecap="round" fill="none"></path>
+      <path d="M8,40 L2,26 L2,54 Z" fill="#1E6FA6"></path>
+      <path d="M8,40 C8,20 30,10 58,10 C86,10 108,22 112,38 C108,50 90,56 70,56 L30,56 C16,56 8,50 8,40 Z" fill="#2E8FCF"></path>
+      <path d="M50,10 L58,-6 L67,10 Z" fill="#1E6FA6"></path>
+      <path d="M28,52 C40,60 72,60 86,52 C76,58 38,58 28,52 Z" fill="#F4F5F2"></path>
+      <circle cx="93" cy="25" r="3.6" fill="#16181A"></circle>
+      <path d="M76,39 C87,46 99,45 108,37" fill="none" stroke="#16181A" stroke-width="2.2" stroke-linecap="round"></path>
+    </g>
+  </svg>
 </div>
 
 <script>
-
 
 const INVENTORY = [
   "Bearing", "Battery Pack", "Bolt", "Bracket",

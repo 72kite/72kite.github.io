@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Professional self-assessment — Zion Jenkins</title>
+<meta name="description" content="CS 499 capstone self-assessment: how four years of coursework and a shift-work Team Lead role shaped the way I build software.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<!-- ============ NAV (liquid glass) ============ -->
+<nav class="glass-nav" aria-label="Section navigation">
+  <a class="brand" href="index.html">ZK</a>
+  <a href="index.html#search-demo">Search demo</a>
+  <a href="index.html#enhancements">Enhancements</a>
+  <a href="index.html#code-review">Code review</a>
+  <a href="index.html#projects">Projects</a>
+  <a class="current" href="self-assessment.html">Self-assessment</a>
+</nav>
+
+<div class="layout">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar seq seq-1">
+    <div class="avatar">
+      <img src="assets/profile-placeholder.png" alt="Placeholder headshot — a real photo is coming soon">
+    </div>
+    <p class="avatar-note">Placeholder — real headshot coming soon</p>
+
+    <div>
+      <h1 class="side-name">Zion Jenkins</h1>
+      <p class="side-standfirst">COMPUTER SCIENCE · SNHU</p>
+    </div>
+
+    <div class="side-block">
+      <span class="side-label">Contact</span>
+      <div class="side-contact">
+        <a href="https://github.com/72kite">GitHub</a>
+        <a href="mailto:zionk.dev@proton.me">Email</a>
+      </div>
+    </div>
+
+    <div class="side-block">
+      <span class="side-label">Skills</span>
+      <p class="side-skills">
+        Kotlin · Java · Python · JavaScript · SQL · Android · Room ·
+        SQLCipher · TensorFlow · Git
+      </p>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN CONTENT ============ -->
+  <main class="content">
+
+    <header class="band page-head seq seq-2" style="border-top:none; padding-top:0;">
+      <span class="eyebrow">Professional self-assessment</span>
+      <p class="entry-links"><a href="index.html">← Back to portfolio</a></p>
+    </header>
+
+    <section class="band" style="border-top:none; padding-top:0;">
+      <p>
+        I build software across the stack, and the work I care most about is the
+        part users never see: the decision underneath the screen. My capstone took
+        an Android inventory app I wrote earlier in the program and rebuilt it
+        three times over — once for structure, once for speed, once for safety.
+        Before any of that, I already understood the problem it solves: I
+        coordinate a team and a stock count every shift as a retail Team Lead, and
+        this app is a rebuild of a process I already run by hand.
+      </p>
+      <p>
+        Most of my coursework was completed independently, so I treated
+        documentation and architecture as a stand-in for a teammate who wasn't in
+        the room — a Repository layer that lets someone swap the data source
+        without touching the UI is the same instinct that keeps a team aligned
+        when the person coordinating it changes shift to shift. Translating
+        technical work for people outside engineering is a skill I built the same
+        way, training volunteers on AV systems and, in coursework like CS 255's
+        client-interview case study, extracting real requirements from how a
+        stakeholder actually talks about their problem rather than from a
+        specification document. This portfolio applies the same instinct: one
+        codebase, presented three different ways for three different readers.
+      </p>
+      <p>
+        Algorithmically, the enhancement I'm proudest of replaced a full linear
+        scan with the hand-built prefix tree on the homepage — O(k) instead of O(n),
+        independent of inventory size — paired with a stable custom MergeSort, and
+        proven with unit tests rather than just asserted in a comment.
+      </p>
+      <p>
+        What the rest of the process taught me is that structure, speed, and
+        safety are the same skill. A Repository sitting between the ViewModel and
+        the data layer is what made swapping raw SQLite for an encrypted Room
+        database a contained change rather than a rewrite — the same seam let me
+        add a foreign-key-scoped schema migration, verified against a real
+        pre-migration database file, without the UI layer needing to change at
+        all.
+      </p>
+      <p>
+        Security, to me, is a design constraint, not a task filed for after
+        launch: passwords are hashed with PBKDF2 and a per-user salt, the database
+        is encrypted at rest behind a passphrase that's never a literal value in
+        source, and where I couldn't fully close a gap — this app's Google
+        sign-in has no backend to verify tokens against — I documented that trust
+        boundary honestly instead of implying a guarantee the architecture doesn't
+        actually provide. That's the kind of software engineering work I'm looking
+        for next.
+      </p>
+      <p class="entry-links" style="margin-top: 1.5rem;">
+        <a href="index.html#enhancements">See the enhancements this describes →</a>
+      </p>
+    </section>
+
+    <footer class="colophon">© 2026 ZION JENKINS</footer>
+
+  </main>
+</div>
+
+<!-- ============ JEFF, THE LANDSHARK ============ -->
+<div class="jeff-track" aria-hidden="true">
+  <svg class="jeff" viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
+    <g class="jeff-bob">
+      <path class="jeff-leg jeff-leg-a" d="M40,56 L36,68" stroke="#1E6FA6" stroke-width="6" stroke-linecap="round" fill="none"></path>
+      <path class="jeff-leg jeff-leg-b" d="M64,56 L68,68" stroke="#1E6FA6" stroke-width="6" stroke-linecap="round" fill="none"></path>
+      <path d="M8,40 L2,26 L2,54 Z" fill="#1E6FA6"></path>
+      <path d="M8,40 C8,20 30,10 58,10 C86,10 108,22 112,38 C108,50 90,56 70,56 L30,56 C16,56 8,50 8,40 Z" fill="#2E8FCF"></path>
+      <path d="M50,10 L58,-6 L67,10 Z" fill="#1E6FA6"></path>
+      <path d="M28,52 C40,60 72,60 86,52 C76,58 38,58 28,52 Z" fill="#F4F5F2"></path>
+      <circle cx="93" cy="25" r="3.6" fill="#16181A"></circle>
+      <path d="M76,39 C87,46 99,45 108,37" fill="none" stroke="#16181A" stroke-width="2.2" stroke-linecap="round"></path>
+    </g>
+  </svg>
+</div>
+
+</body>
+</html>

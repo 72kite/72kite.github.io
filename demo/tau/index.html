@@ -184,6 +184,42 @@ a { color: var(--accent); }
 .chip:hover { border-color: var(--accent); background: var(--accent-soft); }
 .chip:disabled { opacity: 0.5; cursor: default; }
 
+/* screenshot gallery */
+.gallery {
+  border-top: 1px solid var(--rule);
+  padding: 1.5rem 1.25rem 2rem;
+}
+.gallery-note {
+  font-family: var(--body);
+  font-size: 0.85rem;
+  color: var(--muted);
+  max-width: 42rem;
+  margin-bottom: 1.4rem;
+}
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+.gallery-grid figure {
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--raised);
+}
+.gallery-grid img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.gallery-grid figcaption {
+  padding: 0.6rem 0.8rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  border-top: 1px solid var(--rule);
+}
+
 .footer {
   display: flex;
   justify-content: space-between;
@@ -299,6 +335,32 @@ a { color: var(--accent); }
     <button class="chip" data-q="1">arm the front door camera</button>
     <button class="chip" data-q="2">how many devices are online right now?</button>
     <button class="chip" data-q="3">who's home?</button>
+  </div>
+</div>
+
+<div class="gallery">
+  <div class="prompts-label">What it actually looks like</div>
+  <p class="gallery-note">
+    Real screenshots from the running system — the interaction above is a
+    scripted mockup of this same UI, not the other way around.
+  </p>
+  <div class="gallery-grid">
+    <figure>
+      <img src="../../assets/tau/idle.png" alt="tau's idle screen: a wireframe globe with orbiting device rings, status bar reading LOCKDOWN CLEAR, DEVICES 11/12" loading="lazy">
+      <figcaption>Idle — listening, nothing asked yet</figcaption>
+    </figure>
+    <figure>
+      <img src="../../assets/tau/thinking.png" alt="tau mid-query: the orbit tilts into an ellipse and a fan-out diagram shows which subsystems it's checking" loading="lazy">
+      <figcaption>Mid-query — fanning out to memory and devices</figcaption>
+    </figure>
+    <figure>
+      <img src="../../assets/tau/response-shown.png" alt="tau showing a recalled memory and a full answer about a kitchen lighting decision" loading="lazy">
+      <figcaption>Answered — recalled from its own memory</figcaption>
+    </figure>
+    <figure>
+      <img src="../../assets/tau/system-status.png" alt="tau's system status panel: home assistant device counts, security status, memory tree search, and an activity log" loading="lazy">
+      <figcaption>System status — devices, memory, activity log</figcaption>
+    </figure>
   </div>
 </div>
 

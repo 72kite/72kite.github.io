@@ -124,6 +124,9 @@ a { color: var(--accent); }
   max-height: calc(100vh - 8rem);
   overflow-y: auto;
 }
+/* Without this, flexbox shrinks every child (including the photo) to
+   force everything into max-height instead of just scrolling. */
+.sidebar > * { flex-shrink: 0; }
 
 .avatar {
   width: 100%;

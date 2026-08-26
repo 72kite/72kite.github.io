@@ -111,7 +111,23 @@ a { color: var(--accent); }
     gap: 2.5rem;
     padding: 6rem 1.25rem 1.5rem;
   }
-  .sidebar { position: static !important; }
+  /* The sticky/bounded-scroll sidebar only makes sense beside content on
+     wide screens. Stacked on mobile, it must flow at its natural height —
+     otherwise its own overflow-y:auto traps touch-scrolling and the rest
+     of the page becomes unreachable. */
+  .sidebar {
+    position: static !important;
+    max-height: none !important;
+    overflow-y: visible !important;
+  }
+
+  /* The nav pill usually can't fit all its links at this width, so it
+     scrolls horizontally — fade both ends as a hint that there's more,
+     since nothing else here signals it's swipeable. */
+  .glass-nav {
+    mask-image: linear-gradient(to right, transparent, black 18px, black calc(100% - 18px), transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 18px, black calc(100% - 18px), transparent);
+  }
 }
 
 .sidebar {

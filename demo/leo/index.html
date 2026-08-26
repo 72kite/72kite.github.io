@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leo — walkthrough</title>
+<meta name="description" content="A static, scripted walkthrough of Leo, a typing trainer / real-time race / MIDI piano studio. Not a hosted version of the live system.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+
+<style>
+
+:root {
+  --paper:       #F4F5F2;
+  --raised:      #FFFFFF;
+  --ink:         #16181A;
+  --muted:       #6A6F72;
+  --rule:        #DDE0DB;
+  --accent:      #0E5B57;
+  --accent-soft: rgba(14, 91, 87, 0.09);
+
+  --mono: 'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
+  --body: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+
+  /* Leo's own app palette, sampled from the real UI */
+  --leo-bg:     #0a0a0a;
+  --leo-panel:  #141414;
+  --leo-line:   #262626;
+  --leo-text:   #e4e4e4;
+  --leo-dim:    #55585c;
+  --leo-gold:   #d6b64a;
+  --leo-red:    #d15a63;
+  --leo-blue:   #5c8fd6;
+  --leo-purple: #8f6fd6;
+  --leo-pink:   #d669a0;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--mono);
+  color: var(--ink);
+  background: var(--raised);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button { font-family: var(--mono); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ---------- Disclosure banner ---------- */
+.banner {
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+  padding: 0.7rem 1.25rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.banner a { text-decoration: none; border-bottom: 1px solid var(--accent); }
+.banner b { color: var(--ink); }
+
+/* ---------- Leo app chrome (dark, mirrors the real topbar) ---------- */
+.appshell { background: var(--leo-bg); color: var(--leo-text); }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--leo-line);
+}
+.brand {
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  color: var(--leo-gold);
+}
+.brand span { color: var(--leo-text); }
+
+.modetabs { display: flex; gap: 0.4rem; }
+.modetab {
+  background: transparent;
+  border: 1px solid var(--leo-line);
+  color: var(--leo-dim);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.modetab:hover { color: var(--leo-text); }
+.modetab.active {
+  color: var(--leo-gold);
+  border-color: var(--leo-gold);
+  background: rgba(214, 182, 74, 0.08);
+}
+
+.chrome-right { display: flex; align-items: center; gap: 0.75rem; font-size: 0.68rem; color: var(--leo-dim); }
+.pill {
+  border: 1px solid var(--leo-line);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  color: var(--leo-gold);
+  letter-spacing: 0.04em;
+}
+.pill::before { content: "● "; }
+
+/* ---------- Stage ---------- */
+.stage { min-height: 60vh; }
+.panel { display: none; padding: 2.25rem 1.25rem 2.5rem; }
+.panel[data-active="true"] { display: block; }
+
+.runbtn {
+  background: transparent;
+  border: 1px solid var(--leo-gold);
+  color: var(--leo-gold);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.runbtn:hover { background: rgba(214, 182, 74, 0.1); }
+.runbtn:disabled { opacity: 0.45; cursor: default; }
+
+/* ---- Type panel ---- */
+.type-hud {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--leo-dim);
+  margin-bottom: 1.6rem;
+}
+.type-hud b { color: var(--leo-gold); }
+.type-text {
+  font-size: 1.35rem;
+  line-height: 2.1;
+  max-width: 46rem;
+}
+.type-text .w { color: var(--leo-dim); transition: color 0.12s ease; }
+.type-text .w.done { color: var(--leo-text); }
+.type-text .w.err { color: var(--leo-red); text-decoration: underline; text-decoration-color: var(--leo-red); }
+.type-text .w.cur { color: var(--leo-text); position: relative; }
+.type-text .w.cur::after {
+  content: "";
+  position: absolute;
+  left: -0.15em;
+  top: 0.05em;
+  bottom: 0.05em;
+  width: 2px;
+  background: var(--leo-gold);
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ---- Race panel ---- */
+.race-rows { display: flex; flex-direction: column; gap: 0.9rem; max-width: 46rem; margin-bottom: 1.75rem; }
+.race-row { display: grid; grid-template-columns: 6.5rem 1fr 3rem; align-items: center; gap: 0.9rem; font-size: 0.75rem; }
+.race-name { letter-spacing: 0.04em; }
+.race-row.you .race-name { color: var(--leo-gold); }
+.race-track { position: relative; height: 6px; background: var(--leo-line); border-radius: 999px; overflow: hidden; }
+.race-fill { position: absolute; inset: 0 auto 0 0; width: 0%; border-radius: 999px; transition: width 0.4s ease; }
+.race-row.you .race-fill { background: var(--leo-gold); }
+.race-row.p2 .race-fill { background: var(--leo-blue); }
+.race-row.p3 .race-fill { background: var(--leo-purple); }
+.race-row.p4 .race-fill { background: var(--leo-pink); }
+.race-wpm { text-align: right; color: var(--leo-dim); font-variant-numeric: tabular-nums; }
+.race-countdown {
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: var(--leo-gold);
+  height: 3.2rem;
+  margin-bottom: 0.5rem;
+}
+.race-result { font-size: 0.78rem; color: var(--leo-dim); margin-top: 0.25rem; min-height: 1.2rem; }
+.race-result b { color: var(--leo-gold); }
+
+/* ---- Piano panel ---- */
+.piano-wrap { position: relative; }
+.falling-stage {
+  position: relative;
+  height: 220px;
+  border-bottom: 1px solid var(--leo-line);
+  margin-bottom: 0;
+  overflow: hidden;
+}
+.note-pill {
+  position: absolute;
+  top: -40px;
+  transform: translateX(-50%);
+  background: rgba(214, 182, 74, 0.16);
+  border: 1px solid var(--leo-gold);
+  color: var(--leo-gold);
+  font-size: 0.65rem;
+  letter-spacing: 0.03em;
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.keyboard { position: relative; height: 150px; }
+.pk-white {
+  position: absolute;
+  top: 0; height: 150px;
+  background: #f2f2ee;
+  border: 1px solid #111;
+  border-radius: 0 0 4px 4px;
+  transition: background 0.15s ease;
+}
+.pk-white.active { background: var(--leo-gold); }
+.pk-white.chord { background: var(--leo-purple); }
+.pk-black {
+  position: absolute;
+  top: 0; height: 92px;
+  background: #111;
+  border-radius: 0 0 3px 3px;
+  z-index: 2;
+  transition: background 0.15s ease;
+}
+.pk-black.active { background: var(--leo-gold); }
+.pk-black.chord { background: var(--leo-purple); }
+
+.chord-row { display: flex; gap: 0.5rem; margin-top: 1.4rem; }
+.chord-chip {
+  background: transparent;
+  border: 1px solid var(--leo-line);
+  color: var(--leo-dim);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.chord-chip:hover { color: var(--leo-text); border-color: var(--leo-purple); }
+.chord-chip.active { color: var(--leo-purple); border-color: var(--leo-purple); background: rgba(143, 111, 214, 0.1); }
+
+.piano-controls { display: flex; align-items: center; gap: 1rem; margin-top: 1.4rem; flex-wrap: wrap; }
+
+/* ---------- Footer ---------- */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--leo-line);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  color: var(--leo-dim);
+  background: var(--leo-bg);
+}
+.footer a { color: var(--leo-dim); text-decoration: none; border-bottom: 1px solid var(--leo-line); }
+.footer a:hover { color: var(--leo-gold); border-color: var(--leo-gold); }
+
+@media (max-width: 640px) {
+  .type-text { font-size: 1.1rem; }
+  .race-row { grid-template-columns: 5rem 1fr 2.4rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="banner">
+  This is a <b>static, scripted walkthrough</b> — click "Run demo" in each tab to see it move.
+  The real <b>Leo</b> is a full stack: an Express/Socket.io backend with JWT auth, a JSON-or-Postgres
+  persistence layer, live multiplayer races, and real Web Audio/MIDI synthesis. That needs a running
+  server, not a static page, so this fakes the same interactions with canned data and no backend at all.
+  Want to see it running for real? <a href="mailto:zionk.dev@proton.me?subject=Leo%20-%20walkthrough%20follow-up">email me</a>
+  and I'll walk you through a live build. ·
+  <a href="../../index.html">← back to portfolio</a>
+</div>
+
+<div class="appshell">
+  <header class="topbar">
+    <div class="brand">PROJECT <span>LEO</span></div>
+    <nav class="modetabs" id="modeTabs">
+      <button class="modetab active" data-mode="type">Type</button>
+      <button class="modetab" data-mode="race">Race</button>
+      <button class="modetab" data-mode="piano">Piano</button>
+    </nav>
+    <div class="chrome-right">
+      <span class="pill">Keyboard mode</span>
+      <span>guest_walkthrough · Sign in</span>
+    </div>
+  </header>
+
+  <main class="stage">
+
+    <!-- ---------------- TYPE ---------------- -->
+    <section class="panel" id="panel-type" data-active="true">
+      <div class="type-hud">
+        <span>YOU <b id="typeWpm">0</b> wpm</span>
+        <span id="typeAcc">100% accuracy</span>
+      </div>
+      <p class="type-text" id="typeText"></p>
+      <div class="piano-controls">
+        <button class="runbtn" id="typeRun">▶ Run typing demo</button>
+      </div>
+    </section>
+
+    <!-- ---------------- RACE ---------------- -->
+    <section class="panel" id="panel-race">
+      <div class="race-countdown" id="raceCountdown"></div>
+      <div class="race-rows">
+        <div class="race-row you">
+          <span class="race-name">YOU</span>
+          <div class="race-track"><div class="race-fill" id="fillYou"></div></div>
+          <span class="race-wpm" id="wpmYou">0</span>
+        </div>
+        <div class="race-row p2">
+          <span class="race-name">wordsmith92</span>
+          <div class="race-track"><div class="race-fill" id="fillP2"></div></div>
+          <span class="race-wpm" id="wpmP2">0</span>
+        </div>
+        <div class="race-row p3">
+          <span class="race-name">kbd_ninja</span>
+          <div class="race-track"><div class="race-fill" id="fillP3"></div></div>
+          <span class="race-wpm" id="wpmP3">0</span>
+        </div>
+        <div class="race-row p4">
+          <span class="race-name">quietstorm</span>
+          <div class="race-track"><div class="race-fill" id="fillP4"></div></div>
+          <span class="race-wpm" id="wpmP4">0</span>
+        </div>
+      </div>
+      <div class="race-result" id="raceResult"></div>
+      <div class="piano-controls">
+        <button class="runbtn" id="raceRun">▶ Run demo race</button>
+      </div>
+    </section>
+
+    <!-- ---------------- PIANO ---------------- -->
+    <section class="panel" id="panel-piano">
+      <div class="piano-wrap">
+        <div class="falling-stage" id="fallingStage"></div>
+        <div class="keyboard" id="keyboard"></div>
+      </div>
+      <div class="chord-row" id="chordRow">
+        <button class="chord-chip" data-chord="C">C maj</button>
+        <button class="chord-chip" data-chord="F">F maj</button>
+        <button class="chord-chip" data-chord="G">G maj</button>
+      </div>
+      <div class="piano-controls">
+        <button class="runbtn" id="pianoRun">▶ Play demo phrase</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <span>LEO v0.1.0+dev · walkthrough build · <a href="https://github.com/72kite">github.com/72kite</a></span>
+    <span><a href="../../index.html">← back to portfolio</a></span>
+  </footer>
+</div>
+
+<script>
+/* ---------------- Tabs ---------------- */
+const tabs = document.querySelectorAll('.modetab');
+const panels = {
+  type: document.getElementById('panel-type'),
+  race: document.getElementById('panel-race'),
+  piano: document.getElementById('panel-piano'),
+};
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    Object.values(panels).forEach(p => p.dataset.active = "false");
+    panels[tab.dataset.mode].dataset.active = "true";
+  });
+});
+
+/* ---------------- Type demo ---------------- */
+const TYPE_WORDS = "the quick brown fox jumps over the lazy dog and then runs away into the forest where it finds a hidden treasure chest full of golden coins".split(" ");
+const ERROR_WORD_INDEX = 8; // "and" -> mistyped, matches the real app's inline-correction UI
+const typeTextEl = document.getElementById('typeText');
+const typeWpmEl = document.getElementById('typeWpm');
+const typeAccEl = document.getElementById('typeAcc');
+const typeRunBtn = document.getElementById('typeRun');
+
+function buildTypeWords() {
+  typeTextEl.innerHTML = TYPE_WORDS.map((w, i) => `<span class="w" data-i="${i}">${w}</span>`).join(' ');
+}
+buildTypeWords();
+
+function runTypeDemo() {
+  if (typeRunBtn.disabled) return;
+  typeRunBtn.disabled = true;
+  buildTypeWords();
+  typeWpmEl.textContent = '0';
+  typeAccEl.textContent = '100% accuracy';
+  const words = typeTextEl.querySelectorAll('.w');
+  let i = 0;
+  let errors = 0;
+  const perWord = 140;
+  const timer = setInterval(() => {
+    if (i > 0) words[i - 1].classList.remove('cur');
+    if (i >= words.length) {
+      clearInterval(timer);
+      typeRunBtn.disabled = false;
+      return;
+    }
+    if (i === ERROR_WORD_INDEX) {
+      words[i].classList.add('err');
+      errors++;
+    } else {
+      words[i].classList.add('done');
+    }
+    words[i].classList.add('cur');
+    const elapsedMinutes = ((i + 1) * perWord) / 1000 / 60;
+    const wpm = Math.round((i + 1) / elapsedMinutes) || 0;
+    typeWpmEl.textContent = Math.min(wpm, 132);
+    typeAccEl.textContent = Math.round(((i + 1 - errors) / (i + 1)) * 100) + '% accuracy';
+    i++;
+  }, perWord);
+}
+typeRunBtn.addEventListener('click', runTypeDemo);
+
+/* ---------------- Race demo ---------------- */
+const raceRunBtn = document.getElementById('raceRun');
+const raceCountdown = document.getElementById('raceCountdown');
+const raceResult = document.getElementById('raceResult');
+const RACERS = [
+  { fill: 'fillYou', wpm: 'wpmYou', name: 'YOU', target: 78 },
+  { fill: 'fillP2', wpm: 'wpmP2', name: 'wordsmith92', target: 71 },
+  { fill: 'fillP3', wpm: 'wpmP3', name: 'kbd_ninja', target: 64 },
+  { fill: 'fillP4', wpm: 'wpmP4', name: 'quietstorm', target: 49 },
+];
+
+function runRaceDemo() {
+  if (raceRunBtn.disabled) return;
+  raceRunBtn.disabled = true;
+  raceResult.textContent = '';
+  RACERS.forEach(r => { document.getElementById(r.fill).style.width = '0%'; document.getElementById(r.wpm).textContent = '0'; });
+
+  const steps = ['3', '2', '1', 'GO'];
+  let s = 0;
+  raceCountdown.textContent = steps[0];
+  const countdownTimer = setInterval(() => {
+    s++;
+    if (s < steps.length) {
+      raceCountdown.textContent = steps[s];
+    } else {
+      clearInterval(countdownTimer);
+      raceCountdown.textContent = '';
+      startRace();
+    }
+  }, 550);
+
+  function startRace() {
+    const duration = 3200;
+    const start = performance.now();
+    function tick(now) {
+      const t = Math.min((now - start) / duration, 1);
+      RACERS.forEach(r => {
+        const jitter = Math.sin(t * 9 + r.target) * 0.02;
+        const pct = Math.min(100, Math.max(0, (t + jitter) * 100 * (r.target / 78)));
+        document.getElementById(r.fill).style.width = pct + '%';
+        document.getElementById(r.wpm).textContent = Math.round(t * r.target);
+      });
+      if (t < 1) {
+        requestAnimationFrame(tick);
+      } else {
+        const winner = RACERS[0];
+        raceResult.innerHTML = `🏁 <b>${winner.name}</b> wins — ${winner.target} wpm`;
+        raceRunBtn.disabled = false;
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+}
+raceRunBtn.addEventListener('click', runRaceDemo);
+
+/* ---------------- Piano demo ---------------- */
+const WHITE_SEQ = ['C4','D4','E4','F4','G4','A4','B4','C5','D5'];
+const BLACK_AFTER = { C4: 'C#4', D4: 'D#4', F4: 'F#4', G4: 'G#4', A4: 'A#4', C5: 'C#5', D5: 'D#5' };
+const KEY_W = 48;
+const keyboardEl = document.getElementById('keyboard');
+const fallingStageEl = document.getElementById('fallingStage');
+const keyEls = {};
+
+function buildKeyboard() {
+  const totalWidth = WHITE_SEQ.length * KEY_W;
+  keyboardEl.style.width = totalWidth + 'px';
+  keyboardEl.style.margin = '0 auto';
+  fallingStageEl.style.width = totalWidth + 'px';
+  fallingStageEl.style.margin = '0 auto';
+
+  WHITE_SEQ.forEach((note, i) => {
+    const w = document.createElement('div');
+    w.className = 'pk-white';
+    w.style.left = (i * KEY_W) + 'px';
+    w.style.width = (KEY_W - 2) + 'px';
+    keyboardEl.appendChild(w);
+    keyEls[note] = w;
+
+    if (BLACK_AFTER[note]) {
+      const b = document.createElement('div');
+      b.className = 'pk-black';
+      b.style.left = (i * KEY_W + KEY_W * 0.68) + 'px';
+      b.style.width = (KEY_W * 0.6) + 'px';
+      keyboardEl.appendChild(b);
+      keyEls[BLACK_AFTER[note]] = b;
+    }
+  });
+}
+buildKeyboard();
+
+function keyCenterX(note) {
+  const idx = WHITE_SEQ.indexOf(note);
+  if (idx !== -1) return idx * KEY_W + KEY_W / 2;
+  for (const [white, black] of Object.entries(BLACK_AFTER)) {
+    if (black === note) return WHITE_SEQ.indexOf(white) * KEY_W + KEY_W * 0.68 + (KEY_W * 0.6) / 2;
+  }
+  return 0;
+}
+
+const CHORDS = {
+  C: ['C4', 'E4', 'G4'],
+  F: ['F4', 'A4', 'C5'],
+  G: ['G4', 'B4', 'D5'],
+};
+document.querySelectorAll('.chord-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const wasActive = chip.classList.contains('active');
+    document.querySelectorAll('.chord-chip').forEach(c => c.classList.remove('active'));
+    Object.values(keyEls).forEach(el => el.classList.remove('chord'));
+    if (!wasActive) {
+      chip.classList.add('active');
+      CHORDS[chip.dataset.chord].forEach(n => keyEls[n] && keyEls[n].classList.add('chord'));
+    }
+  });
+});
+
+const PHRASE = ['C4', 'D4', 'E4', 'F4', 'G4', 'G4', 'F4'];
+const pianoRunBtn = document.getElementById('pianoRun');
+
+function runPianoDemo() {
+  if (pianoRunBtn.disabled) return;
+  pianoRunBtn.disabled = true;
+  const stageHeight = fallingStageEl.clientHeight;
+  const fallDuration = 1500;
+  const gap = 420;
+
+  PHRASE.forEach((note, i) => {
+    setTimeout(() => {
+      const pill = document.createElement('div');
+      pill.className = 'note-pill';
+      pill.textContent = note;
+      pill.style.left = keyCenterX(note) + 'px';
+      pill.style.transition = `top ${fallDuration}ms linear`;
+      fallingStageEl.appendChild(pill);
+      requestAnimationFrame(() => { pill.style.top = stageHeight + 'px'; });
+
+      setTimeout(() => {
+        pill.remove();
+        const key = keyEls[note];
+        if (key) {
+          key.classList.add('active');
+          setTimeout(() => key.classList.remove('active'), 260);
+        }
+      }, fallDuration);
+    }, i * gap);
+  });
+
+  setTimeout(() => { pianoRunBtn.disabled = false; }, PHRASE.length * gap + fallDuration);
+}
+pianoRunBtn.addEventListener('click', runPianoDemo);
+</script>
+
+</body>
+</html>

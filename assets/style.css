@@ -180,11 +180,24 @@ a { color: var(--accent); }
   width: fit-content;
 }
 .side-contact a:hover { border-bottom-color: var(--accent); }
+
+.skill-group { margin-bottom: 0.75rem; }
+.skill-group:last-child { margin-bottom: 0; }
+.skill-group-label {
+  display: block;
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.2rem;
+}
 .side-skills {
   font-family: var(--mono);
   font-size: 0.72rem;
   color: var(--ink);
-  line-height: 1.9;
+  line-height: 1.7;
   letter-spacing: 0.01em;
 }
 

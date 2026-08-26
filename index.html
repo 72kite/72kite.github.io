@@ -350,6 +350,35 @@ a { color: var(--accent); }
   margin-top: 1rem;
 }
 
+/* ---------- Projects (resume-style, compact) ---------- */
+.projects-list { margin-top: 1.5rem; }
+
+.project-row {
+  padding: 1.1rem 0;
+  border-top: 1px solid var(--rule);
+}
+.project-row:first-of-type { border-top: none; padding-top: 0; }
+
+.project-row-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.project-row-title {
+  font-family: var(--mono);
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.project-row-desc {
+  margin-top: 0.55rem;
+  font-size: 0.92rem;
+}
+
 /* ---------- Skills ---------- */
 .skills {
   font-family: var(--mono);
@@ -394,6 +423,7 @@ a { color: var(--accent); }
       <a href="#self-assessment">Self-assessment</a> ·
       <a href="#enhancements">Enhancements</a> ·
       <a href="#code-review">Code review</a> ·
+      <a href="#projects">Projects</a> ·
       <a href="#contact">Contact</a>
     </nav>
   </header>
@@ -619,6 +649,40 @@ a { color: var(--accent); }
     </p>
     <iframe class="video" src="https://www.youtube.com/embed/g9_eI3Yfrw0"
             title="Code review" allowfullscreen loading="lazy"></iframe>
+  </section>
+
+  <!-- ============ PROJECTS ============
+       Resume-style: one compact row per project, not a full narrative.
+       Copy a .project-row article to add the next one — the list stays
+       scannable no matter how many entries it grows to.
+  -->
+  <section id="projects" class="band">
+    <span class="eyebrow">Other projects</span>
+    <p>
+      The capstone above is the deep dive. These are quicker looks at other
+      things I've built — a running list, not a portfolio-per-project.
+    </p>
+
+    <div class="projects-list">
+      <article class="project-row">
+        <div class="project-row-head">
+          <h3 class="project-row-title">tau — local voice assistant</h3>
+          <span class="status">Private build</span>
+        </div>
+        <p class="project-row-desc">
+          A wake-word ("hey tau") assistant that runs entirely on hardware I
+          own — local LLM, encrypted memory, home-device control. The live
+          system needs a GPU and a house full of devices to mean anything, so
+          I built a static, scripted walkthrough of the real UI instead of
+          pretending a hosted demo would show the same thing.
+        </p>
+        <p class="stack">TypeScript · React · local LLM · wake-word detection · encrypted storage</p>
+        <div class="entry-links">
+          <a href="demo/tau/index.html">Walkthrough</a> ·
+          <a href="mailto:zionk.dev@proton.me?subject=tau%20-%20stripped-down%20build">Request a runnable build</a>
+        </div>
+      </article>
+    </div>
   </section>
 
   <!-- ============ SKILLS ============ -->

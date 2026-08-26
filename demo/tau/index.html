@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tau — walkthrough</title>
+<meta name="description" content="A static, scripted walkthrough of tau, a local-first voice assistant. Not a hosted version of the live system.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+
+<style>
+
+:root {
+  --paper:       #F4F5F2;
+  --raised:      #FFFFFF;
+  --ink:         #16181A;
+  --muted:       #6A6F72;
+  --rule:        #DDE0DB;
+  --accent:      #0E5B57;
+  --accent-soft: rgba(14, 91, 87, 0.09);
+
+  --mono: 'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
+  --body: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--mono);
+  color: var(--ink);
+  background: var(--raised);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ---------- Disclosure banner ---------- */
+.banner {
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+  padding: 0.7rem 1.25rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.banner a { text-decoration: none; border-bottom: 1px solid var(--accent); }
+.banner b { color: var(--ink); }
+
+/* ---------- Top status bar (mirrors the real app's chrome) ---------- */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+}
+.stat-group { display: flex; gap: 2.5rem; }
+.stat dt { color: var(--muted); font-size: 0.62rem; letter-spacing: 0.1em; }
+.stat dd { font-weight: 600; margin-top: 0.2rem; }
+.stat.warn dd { color: var(--accent); }
+.clock { text-align: right; color: var(--muted); }
+.clock b { color: var(--ink); }
+
+/* ---------- Main stage ---------- */
+.stage {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(320px, 1fr);
+  gap: 1.5rem;
+  min-height: 62vh;
+  padding: 2rem 1.25rem;
+  align-items: center;
+}
+@media (max-width: 760px) {
+  .stage { grid-template-columns: 1fr; min-height: auto; }
+}
+
+/* orbit */
+.orbit-wrap { display: grid; place-items: center; }
+.orbit-wrap svg { width: 100%; max-width: 380px; height: auto; }
+.orbit-spin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: spin 50s linear infinite;
+}
+.orbit-spin.busy { animation-duration: 8s; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.node-dot { fill: var(--raised); stroke: var(--ink); stroke-width: 1.4; }
+
+/* fan-out subsystem diagram, shown while "thinking" */
+.fanout { display: none; }
+.fanout.show { display: block; }
+.fanout .hub { fill: var(--ink); }
+.fanout .hub-ring { fill: none; stroke: var(--rule); stroke-width: 6; }
+.fanout text {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.fanout .lbl-active { fill: var(--ink); }
+.fanout .lbl-idle { fill: var(--muted); }
+.fanout .lbl-off { fill: var(--muted); text-decoration: line-through; }
+.fanout .line-active { stroke: var(--ink); stroke-width: 1.4; }
+.fanout .line-idle { stroke: var(--rule); stroke-width: 1.4; stroke-dasharray: 3 3; }
+.fanout .node-active { fill: var(--ink); stroke: var(--ink); }
+.fanout .node-idle { fill: var(--raised); stroke: var(--rule); stroke-width: 1.4; }
+
+/* transcript */
+.transcript { display: flex; flex-direction: column; gap: 1.1rem; min-height: 8rem; }
+.line-user { color: var(--muted); font-size: 0.92rem; }
+.line-user b { color: var(--muted); font-weight: 600; }
+.recalled {
+  font-style: italic;
+  color: var(--muted);
+  font-size: 0.8rem;
+  border-left: 2px solid var(--rule);
+  padding-left: 0.6rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.recalled.show { opacity: 1; }
+.line-answer {
+  font-family: var(--body);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.line-answer.show { opacity: 1; transform: translateY(0); }
+
+.status-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1.25rem 1.5rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--rule);
+}
+.status-dot.busy { background: var(--accent); animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+/* prompt chips */
+.prompts {
+  border-top: 1px solid var(--rule);
+  padding: 1.5rem 1.25rem 2.5rem;
+}
+.prompts-label {
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.9rem;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.chip {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  background: var(--raised);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.chip:hover { border-color: var(--accent); background: var(--accent-soft); }
+.chip:disabled { opacity: 0.5; cursor: default; }
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.footer a { color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--rule); }
+.footer a:hover { color: var(--accent); border-color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="banner">
+  This is a <b>static, scripted walkthrough</b> — click the prompts below to see it move.
+  The real <b>tau</b> runs on my own hardware: local LLM, wake-word detection, encrypted
+  memory, home-device control. That's real compute and real devices, not something I can
+  host for free, so this page fakes the same interaction with no backend at all.
+  Want to see it running for real? <a href="mailto:zionk.dev@proton.me?subject=tau%20-%20stripped-down%20build">email me</a>
+  and I'll walk you through a stripped-down build. ·
+  <a href="../../index.html">← back to portfolio</a>
+</div>
+
+<header class="topbar">
+  <dl class="stat-group">
+    <div class="stat">
+      <dt>LOCKDOWN</dt>
+      <dd>CLEAR</dd>
+    </div>
+    <div class="stat">
+      <dt>DEVICES</dt>
+      <dd id="statDevices">11/12</dd>
+    </div>
+    <div class="stat">
+      <dt>VISION</dt>
+      <dd id="statVision">OFF</dd>
+    </div>
+    <div class="stat">
+      <dt>APPROVALS</dt>
+      <dd>0</dd>
+    </div>
+    <div class="stat">
+      <dt>PEOPLE</dt>
+      <dd id="statPeople">0</dd>
+    </div>
+  </dl>
+  <div class="clock"><b>tau</b> — walkthrough</div>
+</header>
+
+<main class="stage">
+  <div class="orbit-wrap">
+    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+      <g class="orbit-spin" id="orbitSpin">
+        <circle cx="200" cy="200" r="170" fill="none" stroke="var(--ink)" stroke-width="1.2"></circle>
+        <circle cx="200" cy="200" r="115" fill="none" stroke="var(--ink)" stroke-width="1.2"></circle>
+        <circle cx="200" cy="200" r="65"  fill="none" stroke="var(--ink)" stroke-width="1.2"></circle>
+
+        <!-- device markers on outer ring -->
+        <g id="outerNodes"></g>
+        <!-- device markers on middle ring -->
+        <g id="middleNodes"></g>
+      </g>
+
+      <!-- wireframe globe, static (doesn't spin with the rings) -->
+      <g stroke="var(--ink)" stroke-width="1" fill="none">
+        <circle cx="200" cy="200" r="30"></circle>
+        <ellipse cx="200" cy="200" rx="30" ry="11"></ellipse>
+        <ellipse cx="200" cy="200" rx="30" ry="11" transform="rotate(60 200 200)"></ellipse>
+        <ellipse cx="200" cy="200" rx="30" ry="11" transform="rotate(120 200 200)"></ellipse>
+        <ellipse cx="200" cy="200" rx="11" ry="30"></ellipse>
+      </g>
+    </svg>
+  </div>
+
+  <div class="right-col">
+    <div class="transcript" id="transcript">
+      <p class="line-user" id="userLine" style="display:none;"><b>zion</b> <span id="userQuery"></span></p>
+      <p class="recalled" id="recalled"></p>
+      <p class="line-answer" id="answer"></p>
+
+      <!-- subsystem fan-out, shown mid-response -->
+      <svg class="fanout" id="fanout" viewBox="0 0 260 140" width="260" height="140" xmlns="http://www.w3.org/2000/svg">
+        <circle class="hub-ring" cx="30" cy="70" r="16"></circle>
+        <circle class="hub" cx="30" cy="70" r="8"></circle>
+
+        <line id="lnDrone" x1="38" y1="64" x2="220" y2="20" class="line-idle"></line>
+        <circle id="ndDrone" cx="228" cy="16" r="7" class="node-idle"></circle>
+        <text id="lblDrone" x="180" y="10" text-anchor="end" class="lbl-idle">DRONE</text>
+
+        <line id="lnInfra" x1="38" y1="70" x2="220" y2="70" class="line-idle"></line>
+        <circle id="ndInfra" cx="228" cy="70" r="7" class="node-idle"></circle>
+        <text id="lblInfra" x="180" y="74" text-anchor="end" class="lbl-idle">INFRA</text>
+
+        <line id="lnMemory" x1="38" y1="76" x2="220" y2="120" class="line-idle"></line>
+        <circle id="ndMemory" cx="228" cy="124" r="7" class="node-idle"></circle>
+        <text id="lblMemory" x="180" y="132" text-anchor="end" class="lbl-idle">MEMORY</text>
+      </svg>
+    </div>
+  </div>
+</main>
+
+<div class="status-line">
+  <span class="status-dot" id="statusDot"></span>
+  <span id="statusText">LISTENING</span>
+</div>
+
+<div class="prompts">
+  <div class="prompts-label">Try a prompt</div>
+  <div class="chips" id="chips">
+    <button class="chip" data-q="0">what did we decide about the kitchen lighting?</button>
+    <button class="chip" data-q="1">arm the front door camera</button>
+    <button class="chip" data-q="2">how many devices are online right now?</button>
+    <button class="chip" data-q="3">who's home?</button>
+  </div>
+</div>
+
+<footer class="footer">
+  <span>TAU v0.1.0+dev · walkthrough build</span>
+  <span><a href="https://github.com/72kite">github.com/72kite</a></span>
+</footer>
+
+<script>
+const QUERIES = [
+  {
+    q: "what did we decide about the kitchen lighting?",
+    recalled: "recalled: Kitchen lighting decision",
+    answer: "You settled on warm 2700K strips under the cabinets, on a motion trigger after sunset. The overheads stay on the wall switch so a guest can always find the light.",
+    nodes: { drone: "idle", infra: "idle", memory: "active" }
+  },
+  {
+    q: "arm the front door camera",
+    recalled: null,
+    answer: "Front door camera armed. I'll alert you if it flags motion after 10pm.",
+    nodes: { drone: "idle", infra: "active", memory: "idle" },
+    effect: () => { statVision.textContent = "ON"; }
+  },
+  {
+    q: "how many devices are online right now?",
+    recalled: null,
+    answer: "11 of 12 devices are reporting in. The garage sensor has been offline since yesterday — want me to ping it?",
+    nodes: { drone: "active", infra: "active", memory: "idle" }
+  },
+  {
+    q: "who's home?",
+    recalled: null,
+    answer: "Nobody's tripped a sensor in the last twenty minutes. House reads empty.",
+    nodes: { drone: "idle", infra: "active", memory: "idle" },
+    effect: () => { statPeople.textContent = "0"; }
+  }
+];
+
+const orbitSpin   = document.getElementById('orbitSpin');
+const statusDot   = document.getElementById('statusDot');
+const statusText  = document.getElementById('statusText');
+const userLine    = document.getElementById('userLine');
+const userQuery   = document.getElementById('userQuery');
+const recalledEl  = document.getElementById('recalled');
+const answerEl    = document.getElementById('answer');
+const fanoutEl    = document.getElementById('fanout');
+const statVision  = document.getElementById('statVision');
+const statPeople  = document.getElementById('statPeople');
+const chips       = document.querySelectorAll('.chip');
+
+function ring(count, r, phase) {
+  const g = document.createDocumentFragment();
+  for (let i = 0; i < count; i++) {
+    const angle = phase + (i * (2 * Math.PI / count));
+    const cx = 200 + r * Math.cos(angle);
+    const cy = 200 + r * Math.sin(angle);
+    const size = 6;
+    const pts = [
+      [cx, cy - size], [cx + size, cy], [cx, cy + size], [cx - size, cy]
+    ].map(p => p.join(',')).join(' ');
+    const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    poly.setAttribute('points', pts);
+    poly.setAttribute('class', 'node-dot');
+    g.appendChild(poly);
+  }
+  return g;
+}
+document.getElementById('outerNodes').appendChild(ring(8, 170, -Math.PI / 2));
+document.getElementById('middleNodes').appendChild(ring(6, 115, -Math.PI / 2 + 0.3));
+
+function setStatus(text, busy) {
+  statusText.textContent = text;
+  statusDot.classList.toggle('busy', !!busy);
+  orbitSpin.classList.toggle('busy', !!busy);
+}
+
+function setFanout(nodes) {
+  const map = { drone: 'Drone', infra: 'Infra', memory: 'Memory' };
+  Object.keys(map).forEach(key => {
+    const state = nodes[key];
+    const line = document.getElementById('ln' + map[key]);
+    const node = document.getElementById('nd' + map[key]);
+    const lbl  = document.getElementById('lbl' + map[key]);
+    const active = state === 'active';
+    line.setAttribute('class', active ? 'line-active' : 'line-idle');
+    node.setAttribute('class', active ? 'node-active' : 'node-idle');
+    lbl.setAttribute('class', active ? 'lbl-active' : 'lbl-idle');
+  });
+}
+
+let busy = false;
+
+function runQuery(idx) {
+  if (busy) return;
+  busy = true;
+  chips.forEach(c => c.disabled = true);
+
+  const item = QUERIES[idx];
+
+  userLine.style.display = 'block';
+  userQuery.textContent = item.q;
+  recalledEl.classList.remove('show');
+  answerEl.classList.remove('show');
+  fanoutEl.classList.remove('show');
+  answerEl.textContent = '';
+  recalledEl.textContent = '';
+
+  setStatus('THINKING', true);
+
+  setTimeout(() => {
+    setStatus('SEARCHING MEMORY', true);
+    setFanout(item.nodes);
+    fanoutEl.classList.add('show');
+  }, 700);
+
+  setTimeout(() => {
+    if (item.recalled) {
+      recalledEl.textContent = item.recalled;
+      recalledEl.classList.add('show');
+    }
+    answerEl.textContent = item.answer;
+    answerEl.classList.add('show');
+    if (item.effect) item.effect();
+    setStatus('LISTENING', false);
+    fanoutEl.classList.remove('show');
+    busy = false;
+    chips.forEach(c => c.disabled = false);
+  }, 1700);
+}
+
+chips.forEach(chip => {
+  chip.addEventListener('click', () => runQuery(Number(chip.dataset.q)));
+});
+</script>
+
+</body>
+</html>

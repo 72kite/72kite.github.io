@@ -248,6 +248,33 @@ button { font-family: var(--mono); }
 
 .piano-controls { display: flex; align-items: center; gap: 1rem; margin-top: 1.4rem; flex-wrap: wrap; }
 
+/* screenshot gallery teaser (full gallery lives on its own page) */
+.gallery-teaser {
+  border-top: 1px solid var(--leo-line);
+  padding: 1.5rem 1.25rem 2.5rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.gallery-teaser p {
+  font-family: var(--body);
+  font-size: 0.9rem;
+  color: var(--leo-dim);
+  max-width: 34rem;
+}
+.gallery-teaser a {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--leo-gold);
+  text-decoration: none;
+  border-bottom: 1px solid var(--leo-gold);
+  white-space: nowrap;
+}
+.gallery-teaser a:hover { background: rgba(214, 182, 74, 0.1); }
+
 /* ---------- Footer ---------- */
 .footer {
   display: flex;
@@ -356,6 +383,14 @@ button { font-family: var(--mono); }
     </section>
 
   </main>
+
+  <div class="gallery-teaser">
+    <p>
+      This interaction is a scripted mockup — see real screenshots of the
+      actual system running (typing trainer, race mode, piano studio).
+    </p>
+    <a href="gallery.html">View screenshots →</a>
+  </div>
 
   <footer class="footer">
     <span>LEO v0.1.0+dev · walkthrough build · <a href="https://github.com/72kite">github.com/72kite</a></span>

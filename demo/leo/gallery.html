@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leo — screenshots</title>
+<meta name="description" content="Real screenshots of Leo, a typing trainer / real-time race / MIDI piano studio, running against its own backend.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+
+<style>
+
+:root {
+  --paper:       #F4F5F2;
+  --raised:      #FFFFFF;
+  --ink:         #16181A;
+  --muted:       #6A6F72;
+  --rule:        #DDE0DB;
+  --accent:      #0E5B57;
+  --accent-soft: rgba(14, 91, 87, 0.09);
+
+  --mono: 'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
+  --body: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+
+  --leo-bg:   #0a0a0a;
+  --leo-gold: #d6b64a;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--mono);
+  color: var(--ink);
+  background: var(--raised);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- Disclosure banner ---------- */
+.banner {
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+  padding: 0.7rem 1.25rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.banner a { text-decoration: none; border-bottom: 1px solid var(--accent); }
+.banner b { color: var(--ink); }
+
+/* ---------- Top status bar (mirrors the real app's chrome) ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--rule);
+  background: var(--leo-bg);
+}
+.brand {
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  color: var(--leo-gold);
+}
+.brand span { color: #e4e4e4; }
+.clock { font-size: 0.7rem; letter-spacing: 0.06em; color: #55585c; }
+
+/* ---------- Gallery ---------- */
+.gallery-head {
+  padding: 2rem 1.25rem 0.5rem;
+  max-width: 56rem;
+}
+.gallery-head .eyebrow {
+  display: block;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.9rem;
+}
+.gallery-head p {
+  font-family: var(--body);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.shots {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  padding: 2rem 1.25rem 3rem;
+  max-width: 56rem;
+}
+.shot figure {
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--paper);
+}
+.shot img { display: block; width: 100%; height: auto; }
+.shot figcaption {
+  padding: 0.9rem 1.1rem;
+  border-top: 1px solid var(--rule);
+  background: var(--raised);
+}
+.shot-label {
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.shot-desc {
+  display: block;
+  margin-top: 0.35rem;
+  font-family: var(--body);
+  font-size: 0.92rem;
+  color: var(--muted);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.footer a { color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--rule); }
+.footer a:hover { color: var(--accent); border-color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="banner">
+  These are <b>real screenshots</b> of Leo running against its own Express/Socket.io backend — not staged, not the
+  <a href="index.html">scripted walkthrough</a> on the previous page.
+  <a href="../../index.html">← back to portfolio</a> ·
+  <a href="index.html">← back to walkthrough</a>
+</div>
+
+<header class="topbar">
+  <div class="brand">PROJECT <span>LEO</span></div>
+  <div class="clock">screenshots</div>
+</header>
+
+<div class="gallery-head">
+  <span class="eyebrow">What it actually looks like</span>
+  <p>
+    Four moments from a real run against a live backend: a typing test mid-run with live
+    error correction, a four-player race with real Socket.io-relayed progress, and the
+    MIDI piano studio showing both its falling-note notation and its chord selector.
+  </p>
+</div>
+
+<div class="shots">
+  <div class="shot">
+    <figure>
+      <img src="../../assets/leo/typing.png" alt="Leo's typing trainer in practice mode: a row of mode toggles (time, words, quote, zen, word-transform options) above a monospace word list with several mistyped words underlined in red" loading="lazy">
+      <figcaption>
+        <span class="shot-label">01 — Typing trainer</span>
+        <span class="shot-desc">Practice mode, mid-test: word count, duration, and text-transform options along the top; mistyped words flagged inline as you go.</span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="shot">
+    <figure>
+      <img src="../../assets/leo/race.png" alt="Leo's race mode: four players' colored progress bars with live WPM numbers above a shared typing passage showing correct and error highlighting" loading="lazy">
+      <figcaption>
+        <span class="shot-label">02 — Race mode</span>
+        <span class="shot-desc">Four real accounts racing the same passage — Socket.io relays each player's progress bar in real time.</span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="shot">
+    <figure>
+      <img src="../../assets/leo/piano-falling-notes.png" alt="Leo's piano studio: falling note bars labeled with note names descending toward a full-width keyboard, playing the Ode to Joy theme" loading="lazy">
+      <figcaption>
+        <span class="shot-label">03 — Falling notes</span>
+        <span class="shot-desc">A loaded MIDI track ("Ode to Joy") rendered as falling, letter-labeled note bars timed to a full-width keyboard.</span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="shot">
+    <figure>
+      <img src="../../assets/leo/piano-chord-selector.png" alt="Leo's chord selector popover open with a root note, chord-type dropdown set to Major, and octave control, with the corresponding C major keys highlighted purple on the keyboard" loading="lazy">
+      <figcaption>
+        <span class="shot-label">04 — Chord selector</span>
+        <span class="shot-desc">Pick a root, chord type, and octave; the matching keys light up purple on the keyboard and "Play Chord" sounds the voicing.</span>
+      </figcaption>
+    </figure>
+  </div>
+</div>
+
+<footer class="footer">
+  <span>LEO v0.1.0+dev · real screenshots</span>
+  <span><a href="https://github.com/72kite">github.com/72kite</a></span>
+</footer>
+
+</body>
+</html>

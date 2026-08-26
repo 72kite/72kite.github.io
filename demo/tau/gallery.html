@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tau — screenshots</title>
+<meta name="description" content="Real screenshots of tau, a local-first voice assistant, running on its own hardware.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+
+<style>
+
+:root {
+  --paper:       #F4F5F2;
+  --raised:      #FFFFFF;
+  --ink:         #16181A;
+  --muted:       #6A6F72;
+  --rule:        #DDE0DB;
+  --accent:      #0E5B57;
+  --accent-soft: rgba(14, 91, 87, 0.09);
+
+  --mono: 'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
+  --body: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--mono);
+  color: var(--ink);
+  background: var(--raised);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- Disclosure banner ---------- */
+.banner {
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+  padding: 0.7rem 1.25rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.banner a { text-decoration: none; border-bottom: 1px solid var(--accent); }
+.banner b { color: var(--ink); }
+
+/* ---------- Top status bar (mirrors the real app's chrome) ---------- */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+}
+.stat-group { display: flex; gap: 2.5rem; }
+.stat dt { color: var(--muted); font-size: 0.62rem; letter-spacing: 0.1em; }
+.stat dd { font-weight: 600; margin-top: 0.2rem; }
+.clock { text-align: right; color: var(--muted); }
+.clock b { color: var(--ink); }
+
+/* ---------- Gallery ---------- */
+.gallery-head {
+  padding: 2rem 1.25rem 0.5rem;
+  max-width: 56rem;
+}
+.gallery-head .eyebrow {
+  display: block;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.9rem;
+}
+.gallery-head p {
+  font-family: var(--body);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.shots {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  padding: 2rem 1.25rem 3rem;
+  max-width: 56rem;
+}
+.shot figure {
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--paper);
+}
+.shot img { display: block; width: 100%; height: auto; }
+.shot figcaption {
+  padding: 0.9rem 1.1rem;
+  border-top: 1px solid var(--rule);
+  background: var(--raised);
+}
+.shot-label {
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.shot-desc {
+  display: block;
+  margin-top: 0.35rem;
+  font-family: var(--body);
+  font-size: 0.92rem;
+  color: var(--muted);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.footer a { color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--rule); }
+.footer a:hover { color: var(--accent); border-color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="banner">
+  These are <b>real screenshots</b> of tau running on my own hardware — not staged, not the
+  <a href="index.html">scripted walkthrough</a> on the previous page.
+  <a href="../../index.html">← back to portfolio</a> ·
+  <a href="index.html">← back to walkthrough</a>
+</div>
+
+<header class="topbar">
+  <dl class="stat-group">
+    <div class="stat"><dt>LOCKDOWN</dt><dd>CLEAR</dd></div>
+    <div class="stat"><dt>DEVICES</dt><dd>11/12</dd></div>
+    <div class="stat"><dt>VISION</dt><dd>OFF</dd></div>
+    <div class="stat"><dt>APPROVALS</dt><dd>0</dd></div>
+    <div class="stat"><dt>PEOPLE</dt><dd>0</dd></div>
+  </dl>
+  <div class="clock"><b>tau</b> — screenshots</div>
+</header>
+
+<div class="gallery-head">
+  <span class="eyebrow">What it actually looks like</span>
+  <p>
+    Four moments from the same session: sitting idle, mid-query while it fans
+    out to check memory and devices, an answer recalled from something it was
+    told weeks earlier, and the system status panel that tracks every device,
+    person, and memory it knows about.
+  </p>
+</div>
+
+<div class="shots">
+  <div class="shot">
+    <figure>
+      <img src="../../assets/tau/idle.png" alt="tau's idle screen: a wireframe globe with orbiting device rings, status bar reading LOCKDOWN CLEAR, DEVICES 11/12" loading="lazy">
+      <figcaption>
+        <span class="shot-label">01 — Idle</span>
+        <span class="shot-desc">Listening, nothing asked yet. The orbit rings represent the devices it's watching.</span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="shot">
+    <figure>
+      <img src="../../assets/tau/thinking.png" alt="tau mid-query: the orbit tilts into an ellipse and a fan-out diagram shows which subsystems it's checking" loading="lazy">
+      <figcaption>
+        <span class="shot-label">02 — Mid-query</span>
+        <span class="shot-desc">"What did we decide about the kitchen lighting?" — the fan-out diagram shows it checking memory, not devices, for this one.</span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="shot">
+    <figure>
+      <img src="../../assets/tau/response-shown.png" alt="tau showing a recalled memory and a full answer about a kitchen lighting decision" loading="lazy">
+      <figcaption>
+        <span class="shot-label">03 — Answered</span>
+        <span class="shot-desc">The answer, with the specific memory it recalled cited above it — not a generic response.</span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="shot">
+    <figure>
+      <img src="../../assets/tau/system-status.png" alt="tau's system status panel: home assistant device counts, security status, memory tree search, and an activity log" loading="lazy">
+      <figcaption>
+        <span class="shot-label">04 — System status</span>
+        <span class="shot-desc">Device counts, lockdown/security state, a searchable memory tree, and a live activity log of every tool call.</span>
+      </figcaption>
+    </figure>
+  </div>
+</div>
+
+<footer class="footer">
+  <span>TAU v0.1.0+dev · real screenshots</span>
+  <span><a href="https://github.com/72kite">github.com/72kite</a></span>
+</footer>
+
+</body>
+</html>
